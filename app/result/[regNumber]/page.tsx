@@ -113,11 +113,12 @@ export default function ResultPage() {
       }
       await html2pdf()
         .set({
-          margin: 0.5,
+          margin: 0, // No margin for full A4 coverage
           filename: `Result_${result?.student.regNumber}.pdf`,
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#fff' },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+          image: { type: 'jpeg', quality: 0.98 },
         })
         .from(element)
         .save()
