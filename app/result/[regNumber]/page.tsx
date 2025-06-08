@@ -115,9 +115,9 @@ export default function ResultPage() {
         .set({
           margin: 0, // No margin for full A4 coverage
           filename: `Result_${result?.student.regNumber}.pdf`,
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#fff' },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#fff', windowWidth: element.scrollWidth, windowHeight: element.scrollHeight },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+          pagebreak: { mode: ['css', 'legacy'], before: '.pdf-pagebreak', after: undefined, avoid: ['.no-break'] },
           image: { type: 'jpeg', quality: 0.98 },
         })
         .from(element)
