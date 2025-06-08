@@ -6,6 +6,7 @@ import ResultCard from "@/components/ResultCard"
 import { Button } from "@/components/ui/button"
 import { Download, PrinterIcon as Print, Share2, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 
 interface ResultData {
   student: {
@@ -101,8 +102,31 @@ export default function ResultPage() {
   }
 
   const handleDownload = async () => {
-    // This would implement PDF generation
-    alert("PDF download functionality will be implemented soon!")
+    if (typeof window === "undefined") return;
+    setPrinting(true)
+    try {
+      const html2pdf = (await import("html2pdf.js"))?.default || (await import("html2pdf.js"));
+      const element = document.querySelector(".print-area") as HTMLElement
+      if (!element) {
+        alert("Result content not found for PDF export.")
+        return
+      }
+      await html2pdf()
+        .set({
+          margin: 0.5,
+          filename: `Result_${result?.student.regNumber}.pdf`,
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+        })
+        .from(element)
+        .save()
+    } catch (err) {
+      alert("Failed to generate PDF. Please try again.")
+      console.error(err)
+    } finally {
+      setPrinting(false)
+    }
   }
 
   const handleShare = async () => {
