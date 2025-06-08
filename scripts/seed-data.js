@@ -18,13 +18,13 @@ async function seedData() {
 
   // Create subjects
   const subjects = await Subject.insertMany([
-    { name: "Biology", nameArabic: "بیماری", code: "BIO", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-    { name: "Chemistry", nameArabic: "بخاری", code: "CHE", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-    { name: "Physics", nameArabic: "مسلم", code: "PHY", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-    { name: "Mathematics", nameArabic: "ابن ماجہ ونسائی", code: "MAT", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-    { name: "Islamic Studies", nameArabic: "ترمذی", code: "ISL", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-    { name: "Arabic", nameArabic: "جمع", code: "ARA", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-    { name: "English", nameArabic: "اللغة", code: "ENG", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "BAIDHAVI", nameArabic: "بيضاوي", code: "BAI", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "BUKHARI", nameArabic: "بخاری", code: "BUK", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "MUSLIM", nameArabic: "مسلم", code: "MUS", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "IBNU MAJAH", nameArabic: "ابن ماجہ ونسائی", code: "IBN", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "TURMUDHEY", nameArabic: "ترمذی", code: "TUR", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "JAM", nameArabic: "جمع", code: "JAM", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+    { name: "LANGUAGE", nameArabic: "اللغة", code: "LANG", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
   ])
 
   // Create batch
