@@ -34,11 +34,11 @@ export default function HomePage() {
                 <p className="text-sm text-gray-600">ASAS MALIKI EXAMINATION</p>
               </div>
             </div>
-            <Link href="/admin">
+            {/* <Link href="/admin">
               <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                 Admin Panel
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </header>
@@ -205,9 +205,9 @@ export default function HomePage() {
               <h6 className="font-semibold mb-4">Quick Links</h6>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <Link href="/admin" className="hover:text-white transition-colors">
+                  {/* <Link href="/admin" className="hover:text-white transition-colors">
                     Admin Panel
-                  </Link>
+                  </Link> */}
                 </li>
                 <li>
                   <Link href="/admin/students" className="hover:text-white transition-colors">
