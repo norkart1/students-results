@@ -13,7 +13,7 @@ export default function HomePage() {
 
   const handleResultSearch = () => {
     if (regNumber.trim()) {
-      window.open(`/result/${regNumber}`, "_blank")
+      window.location.href = `/result/${regNumber}`
     }
   }
 
