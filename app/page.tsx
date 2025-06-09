@@ -149,7 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* Sample Result Preview */}
-      <section className="py-16">
+      {/* <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">Sample Result Format</h3>
@@ -183,7 +183,7 @@ export default function HomePage() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
@@ -231,8 +231,8 @@ export default function HomePage() {
               <h6 className="font-semibold mb-4">Contact Info</h6>
               <div className="text-gray-400 space-y-2">
                 <p>ASAS MALIKI EXAMINATION</p>
-                <p>Email: admin@asamaliki.edu</p>
-                <p>Phone: +1 (555) 123-4567</p>
+                <p>Email: micthrissur@gmail.com</p>
+                <p>Phone: 0487 244 5828</p>
               </div>
             </div>
           </div>

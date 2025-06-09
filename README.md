@@ -66,7 +66,7 @@ Create a `.env.local` file in the root directory:
 # .env.local
 MONGODB_URI=mongodb://localhost:27017/result-management-system
 NEXT_PUBLIC_SITE_NAME=ASAS MALIKI EXAMINATION
-ADMIN_EMAIL=admin@asamaliki.edu
+ADMIN_EMAIL=micthrissur@gmail.com
 ```
 
 ### 4. Run the development server
@@ -117,7 +117,7 @@ pnpm exec tsx scripts/seed-data.js
 ```env
 MONGODB_URI=mongodb://localhost:27017/result-management-system
 NEXT_PUBLIC_SITE_NAME=ASAS MALIKI EXAMINATION
-ADMIN_EMAIL=admin@asamaliki.edu
+ADMIN_EMAIL=micthrissur@gmail.com
 ```
 
 ---
