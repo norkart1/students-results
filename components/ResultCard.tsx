@@ -99,7 +99,7 @@ export default function ResultCard({
             </div>
             <div>
               <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">Examination</label>
-              <p className="text-sm font-medium text-gray-700">First Semester 2025</p>
+              <p className="text-sm font-medium text-gray-700">Final Semester 2024-25</p>
             </div>
           </div>
         </div>

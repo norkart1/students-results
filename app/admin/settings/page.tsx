@@ -109,7 +109,7 @@ export default function SettingsPage() {
               <ul className="text-blue-800 space-y-1 text-sm">
                 <li>• 9 Students (JAMSHAD O.B, M. SWALIH P, SAHAL M, etc.)</li>
                 <li>• 7 Subjects with Arabic names (بیماری, بخاری, مسلم, etc.)</li>
-                <li>• 1 Batch: NIHAYA 2 - First Semester 2025</li>
+                <li>• 1 Batch: NIHAYA 2 - Final Semester 2024-25</li>
                 <li>• 4 Complete Results with proper rankings and percentages</li>
                 <li>• Realistic marks distribution matching your result format</li>
               </ul>
