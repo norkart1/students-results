@@ -347,7 +347,7 @@ export default function ResultsPage() {
 
       {/* Edit Subject Marks Modal */}
       <Dialog open={editModalOpen} onOpenChange={closeEditModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Subject Marks</DialogTitle>
           </DialogHeader>
@@ -356,42 +356,44 @@ export default function ResultsPage() {
             <div>No subjects found for this result.</div>
           ) : (
             <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleEditSave(); }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {editSubjects.map((subj, idx) => (
-                  <div key={subj.subject._id} className="border rounded p-3 bg-gray-50">
-                    <div className="font-semibold mb-1">{subj.subject.name} ({subj.subject.code})</div>
-                    <div className="flex gap-2 items-center mb-1">
-                      <Label className="w-28">Written</Label>
+                  <div key={subj.subject._id} className="border rounded p-3 bg-gray-50 flex flex-col gap-2 shadow-sm">
+                    <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>{subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span></div>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Label className="w-24 min-w-max">Written</Label>
                       <Input
                         type="number"
                         value={subj.writtenMarks}
                         min={0}
                         onChange={e => handleSubjectMarkChange(idx, "writtenMarks", Number(e.target.value))}
-                        className="w-24"
+                        className="w-full sm:w-24"
                         required
+                        inputMode="numeric"
                       />
                     </div>
-                    <div className="flex gap-2 items-center mb-1">
-                      <Label className="w-28">CE</Label>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Label className="w-24 min-w-max">CE</Label>
                       <Input
                         type="number"
                         value={subj.ceMarks}
                         min={0}
                         onChange={e => handleSubjectMarkChange(idx, "ceMarks", Number(e.target.value))}
-                        className="w-24"
+                        className="w-full sm:w-24"
                         required
+                        inputMode="numeric"
                       />
                     </div>
-                    <div className="flex gap-2 items-center">
-                      <Label className="w-28">Total</Label>
-                      <Input type="number" value={subj.totalMarks} readOnly className="w-24 bg-gray-100" />
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Label className="w-24 min-w-max">Total</Label>
+                      <Input type="number" value={subj.totalMarks} readOnly className="w-full sm:w-24 bg-gray-100" />
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={closeEditModal}>Cancel</Button>
-                <Button type="submit" disabled={editLoading} className="bg-gradient-to-r from-blue-500 to-purple-600">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={closeEditModal} className="w-full sm:w-auto">Cancel</Button>
+                <Button type="submit" disabled={editLoading} className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600">
                   {editLoading ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
