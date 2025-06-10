@@ -69,7 +69,7 @@ export default function ResultCard({
           <div className="mb-4">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AS</span>
+                <img src="/images/logo.webp" alt="Logo" className="w-10 h-10 object-contain" />
               </div>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold leading-tight">{examTitle}</h1>
