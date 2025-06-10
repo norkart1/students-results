@@ -12,12 +12,12 @@ export default function AdminLoginPage() {
       >
         <h1 className="text-2xl font-bold text-center text-gray-900">Admin Login</h1>
         <div>
-          <label className="block text-gray-700 mb-2" htmlFor="email">Email</label>
+          <label className="block text-gray-700 mb-2" htmlFor="username">Username</label>
           <input
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            type="email"
-            name="email"
-            id="email"
+            type="text"
+            name="username"
+            id="username"
             required
             autoFocus
           />

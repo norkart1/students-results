@@ -3,13 +3,13 @@ import type { NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData()
-  const email = formData.get('email')
+  const username = formData.get('username')
   const password = formData.get('password')
 
-  const adminEmail = process.env.ADMIN_EMAIL
+  const adminUsername = process.env.ADMIN_USERNAME
   const adminPassword = process.env.ADMIN_PASSWORD
 
-  if (email === adminEmail && password === adminPassword) {
+  if (username === adminUsername && password === adminPassword) {
     // Set a session cookie (simple, not secure for production)
     const res = NextResponse.redirect(new URL(request.nextUrl.searchParams.get('redirect') || '/admin', request.url))
     res.cookies.set('admin-auth', '1', {
