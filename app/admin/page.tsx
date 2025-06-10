@@ -98,13 +98,13 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-0">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Welcome to the Result Management System</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-2 text-sm sm:text-base">Welcome to the Result Management System</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((card) => {
           const Icon = card.icon
           return (
@@ -130,13 +130,13 @@ export default function AdminDashboard() {
       {/* Seed Data Section */}
       <Card className="shadow-lg border-l-4 border-l-blue-500">
         <CardHeader>
-          <CardTitle className="flex items-center">
+          <CardTitle className="flex items-center text-base sm:text-lg">
             <Database className="w-5 h-5 mr-2 text-blue-600" />
             Sample Data Management
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 text-sm sm:text-base">
             <p className="text-gray-600">
               Get started quickly by loading sample data including students, subjects, batches, and results.
             </p>
@@ -149,11 +149,11 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
               <Button
                 onClick={handleSeedData}
                 disabled={seeding}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto"
               >
                 {seeding ? (
                   <>
@@ -167,21 +167,21 @@ export default function AdminDashboard() {
                   </>
                 )}
               </Button>
+            </div>
 
-              <div className="text-sm text-gray-500 flex items-center">
-                <div className="space-y-1">
-                  <div>• 9 Sample Students (from your result image)</div>
-                  <div>• 7 Subjects with Arabic names</div>
-                  <div>• 1 Batch (NIHAYA 2 - 2025)</div>
-                  <div>• 4 Complete Results with rankings</div>
-                </div>
+            <div className="text-sm text-gray-500 flex items-center">
+              <div className="space-y-1">
+                <div>• 9 Sample Students (from your result image)</div>
+                <div>• 7 Subjects with Arabic names</div>
+                <div>• 1 Batch (NIHAYA 2 - 2025)</div>
+                <div>• 4 Complete Results with rankings</div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center">
