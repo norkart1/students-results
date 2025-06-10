@@ -29,6 +29,20 @@ export default function AdminHeader() {
             </div>
             <span className="text-sm font-medium text-gray-700">Admin</span>
           </div>
+
+          {/* Logout Button */}
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              // Remove the session cookie by calling logout endpoint
+              await fetch('/api/admin-logout', { method: 'POST' });
+              window.location.href = '/';
+            }}
+          >
+            <Button type="submit" variant="outline" size="sm">
+              Logout
+            </Button>
+          </form>
         </div>
       </div>
     </header>
