@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import dbConnect from "@/lib/mongodb"
 import Student from "@/models/Student"
+import Notification from "@/models/Notification"
 
 export async function GET() {
   try {
@@ -17,6 +18,10 @@ export async function POST(request: NextRequest) {
     await dbConnect()
     const body = await request.json()
     const student = await Student.create(body)
+    // Create notification for new student
+    await Notification.create({
+      message: `New student registered: ${student.name || student.regNumber || "Unknown"}`,
+    })
     return NextResponse.json(student, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: "Failed to create student" }, { status: 500 })

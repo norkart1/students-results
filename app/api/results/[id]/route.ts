@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import dbConnect from "@/lib/mongodb"
 import Result from "@/models/Result"
+import Notification from "@/models/Notification"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -54,6 +55,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (!result) {
       return NextResponse.json({ error: "Result not found" }, { status: 404 })
     }
+    // Create notification for result update
+    await Notification.create({
+      message: `Result updated for student: ${result.student?.name || result.student || "Unknown"}`,
+    })
     return NextResponse.json({ message: "Result updated successfully" })
   } catch (error) {
     return NextResponse.json({ error: "Failed to update result" }, { status: 500 })

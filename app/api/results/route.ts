@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import dbConnect from "@/lib/mongodb"
 import Result from "@/models/Result"
+import Notification from "@/models/Notification"
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,6 +36,11 @@ export async function POST(request: NextRequest) {
       ...body,
       grandTotal,
       percentage: Math.round(percentage * 10) / 10,
+    })
+
+    // Create notification for new result/marks entry
+    await Notification.create({
+      message: `Result added for student: ${result.student?.name || result.student || "Unknown"}`,
     })
 
     return NextResponse.json(result, { status: 201 })
