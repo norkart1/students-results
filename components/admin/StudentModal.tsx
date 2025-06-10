@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import StudentAvatarUploader from "@/components/admin/StudentAvatarUploader"
 
 interface Student {
   _id?: string
@@ -46,13 +47,15 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
   const [loading, setLoading] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
       fetchBatches()
       if (student) {
         setFormData(student)
-        setPhotoPreview(student.profilePhoto ? `/profile-photos/${student.profilePhoto}` : null)
+        setPhotoPreview(student.profilePhoto ? student.profilePhoto : null)
+        setAvatarUrl(student.profilePhoto || "")
       } else {
         setFormData({
           regNumber: "",
@@ -64,6 +67,7 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
           profilePhoto: "",
         })
         setPhotoPreview(null)
+        setAvatarUrl("")
       }
     }
   }, [isOpen, student])
@@ -86,28 +90,21 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
     }
   }
 
+  const handleAvatarUpload = (url: string) => {
+    setAvatarUrl(url)
+    setFormData((prev) => ({ ...prev, profilePhoto: url }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
-      let profilePhoto = formData.profilePhoto
-      if (photoFile) {
-        // Upload photo to /profile-photos/ via API route
-        const form = new FormData()
-        form.append("file", photoFile)
-        form.append("regNumber", formData.regNumber)
-        const uploadRes = await fetch("/api/students/upload-photo", { method: "POST", body: form })
-        if (uploadRes.ok) {
-          const { filename } = await uploadRes.json()
-          profilePhoto = filename
-        }
-      }
       const url = student ? `/api/students/${student._id}` : "/api/students"
       const method = student ? "PUT" : "POST"
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, profilePhoto }),
+        body: JSON.stringify({ ...formData, profilePhoto: avatarUrl }),
       })
       if (response.ok) {
         onSave()
@@ -126,7 +123,6 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
         <DialogHeader>
           <DialogTitle>{student ? "Edit Student" : "Add New Student"}</DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="regNumber">Registration Number</Label>
@@ -185,9 +181,9 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
 
           <div>
             <Label htmlFor="profilePhoto">Profile Photo</Label>
-            <Input id="profilePhoto" type="file" accept="image/*" onChange={handlePhotoChange} />
-            {photoPreview && (
-              <img src={photoPreview} alt="Profile Preview" className="mt-2 w-20 h-20 rounded-full object-cover border" />
+            <StudentAvatarUploader regNumber={formData.regNumber} onUpload={handleAvatarUpload} />
+            {avatarUrl && (
+              <img src={avatarUrl} alt="Profile Preview" className="mt-2 w-20 h-20 rounded-full object-cover border" />
             )}
           </div>
 
