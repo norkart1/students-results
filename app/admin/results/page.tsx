@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Eye, Edit, Trash2, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 
 interface Result {
   _id: string
@@ -31,6 +33,17 @@ interface Batch {
   year: number
 }
 
+interface SubjectMark {
+  subject: {
+    _id: string
+    name: string
+    code: string
+  }
+  writtenMarks: number
+  ceMarks: number
+  totalMarks: number
+}
+
 export default function ResultsPage() {
   const [results, setResults] = useState<Result[]>([])
   const [filteredResults, setFilteredResults] = useState<Result[]>([])
@@ -39,6 +52,11 @@ export default function ResultsPage() {
   const [selectedBatch, setSelectedBatch] = useState<string>("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editResult, setEditResult] = useState<Result | null>(null)
+  const [editSubjects, setEditSubjects] = useState<SubjectMark[]>([])
+  const [editLoading, setEditLoading] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -126,6 +144,56 @@ export default function ResultsPage() {
     if (rank === 2) return "bg-gray-400 text-white"
     if (rank === 3) return "bg-orange-500 text-white"
     return "bg-gray-200 text-gray-700"
+  }
+
+  const openEditModal = (result: Result) => {
+    setEditResult(result)
+    // Fetch full result with subjects if not present
+    fetch(`/api/results/${result._id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setEditSubjects(data.subjects || [])
+        setEditModalOpen(true)
+      })
+      .catch(() => {
+        setEditSubjects([])
+        setEditModalOpen(true)
+      })
+  }
+
+  const closeEditModal = () => {
+    setEditModalOpen(false)
+    setEditResult(null)
+    setEditSubjects([])
+    setEditError(null)
+  }
+
+  const handleSubjectMarkChange = (idx: number, field: string, value: number) => {
+    setEditSubjects((prev) =>
+      prev.map((subj, i) =>
+        i === idx ? { ...subj, [field]: value, totalMarks: field === "writtenMarks" || field === "ceMarks" ? (field === "writtenMarks" ? value : subj.writtenMarks) + (field === "ceMarks" ? value : subj.ceMarks) : subj.totalMarks } : subj
+      )
+    )
+  }
+
+  const handleEditSave = async () => {
+    if (!editResult) return
+    setEditLoading(true)
+    setEditError(null)
+    try {
+      const response = await fetch(`/api/results/${editResult._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subjects: editSubjects }),
+      })
+      if (!response.ok) throw new Error("Failed to update result")
+      closeEditModal()
+      fetchData()
+    } catch (err) {
+      setEditError("Failed to update marks. Please try again.")
+    } finally {
+      setEditLoading(false)
+    }
   }
 
   if (loading) {
@@ -260,7 +328,7 @@ export default function ResultsPage() {
                               <Eye className="w-4 h-4" />
                             </Button>
                           </Link>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => openEditModal(result)}>
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => handleDelete(result._id)}>
@@ -276,6 +344,61 @@ export default function ResultsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Subject Marks Modal */}
+      <Dialog open={editModalOpen} onOpenChange={closeEditModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Subject Marks</DialogTitle>
+          </DialogHeader>
+          {editError && <div className="text-red-500 mb-2">{editError}</div>}
+          {editSubjects.length === 0 ? (
+            <div>No subjects found for this result.</div>
+          ) : (
+            <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleEditSave(); }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {editSubjects.map((subj, idx) => (
+                  <div key={subj.subject._id} className="border rounded p-3 bg-gray-50">
+                    <div className="font-semibold mb-1">{subj.subject.name} ({subj.subject.code})</div>
+                    <div className="flex gap-2 items-center mb-1">
+                      <Label className="w-28">Written</Label>
+                      <Input
+                        type="number"
+                        value={subj.writtenMarks}
+                        min={0}
+                        onChange={e => handleSubjectMarkChange(idx, "writtenMarks", Number(e.target.value))}
+                        className="w-24"
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-2 items-center mb-1">
+                      <Label className="w-28">CE</Label>
+                      <Input
+                        type="number"
+                        value={subj.ceMarks}
+                        min={0}
+                        onChange={e => handleSubjectMarkChange(idx, "ceMarks", Number(e.target.value))}
+                        className="w-24"
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Label className="w-28">Total</Label>
+                      <Input type="number" value={subj.totalMarks} readOnly className="w-24 bg-gray-100" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={closeEditModal}>Cancel</Button>
+                <Button type="submit" disabled={editLoading} className="bg-gradient-to-r from-blue-500 to-purple-600">
+                  {editLoading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
