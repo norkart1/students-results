@@ -48,7 +48,7 @@ export default function HomePage() {
               </div>
             </div>
             <Link href="/admin">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto mt-2 sm:mt-0">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto mt-2 sm:mt-0 hidden sm:block">
                 Admin Panel
               </Button>
             </Link>
