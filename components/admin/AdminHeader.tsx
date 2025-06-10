@@ -32,11 +32,19 @@ export default function AdminHeader() {
 
           {/* Logout Button */}
           <form
+            action="/api/admin-logout" method="POST"
             onSubmit={async (e) => {
               e.preventDefault();
-              // Remove the session cookie by calling logout endpoint
-              await fetch('/api/admin-logout', { method: 'POST' });
-              window.location.href = '/';
+              try {
+                const res = await fetch('/api/admin-logout', { method: 'POST' });
+                if (res.ok) {
+                  window.location.href = '/admin/login';
+                } else {
+                  alert('Logout failed.');
+                }
+              } catch {
+                alert('Logout failed.');
+              }
             }}
           >
             <Button type="submit" variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
