@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { GraduationCap, Users, FileText, BarChart3, Search, Cloud } from "lucide-react"
 import { useState } from "react"
+import { motion } from "framer-motion"
 
 export default function HomePage() {
   const [regNumber, setRegNumber] = useState("")
@@ -18,9 +19,19 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50"
+    >
       {/* Header */}
-      <header className="bg-white shadow-sm border-b w-full sticky top-0 z-30">
+      <motion.header
+        initial={{ y: -40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="bg-white shadow-sm border-b w-full sticky top-0 z-30"
+      >
         <div className="container mx-auto px-2 sm:px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
             <div className="flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
@@ -43,10 +54,16 @@ export default function HomePage() {
             </Link> */}
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Hero Section */}
-      <section className="py-20">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="py-20"
+      >
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Check Your
@@ -86,10 +103,16 @@ export default function HomePage() {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </motion.section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white/50">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+        className="py-16 bg-white/50"
+      >
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">System Features</h3>
@@ -99,56 +122,65 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="text-center hover:shadow-lg transition-shadow bg-blue-50 border-0">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Student Management</h4>
-                <p className="text-gray-600 text-sm">
-                  Complete student records with registration, contact details, and batch management
-                </p>
-              </CardContent>
-            </Card>
+            {/* Animate each card */}
+            <motion.div whileHover={{ scale: 1.04, boxShadow: "0 8px 32px rgba(80,80,200,0.10)" }} transition={{ type: "spring", stiffness: 300 }}>
+              <Card className="text-center hover:shadow-lg transition-shadow bg-blue-50 border-0">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Student Management</h4>
+                  <p className="text-gray-600 text-sm">
+                    Complete student records with registration, contact details, and batch management
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            <Card className="text-center hover:shadow-lg transition-shadow bg-green-50 border-0">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Result Processing</h4>
-                <p className="text-gray-600 text-sm">
-                  Automated result calculation with ranking, percentage, and grade computation
-                </p>
-              </CardContent>
-            </Card>
+            <motion.div whileHover={{ scale: 1.04, boxShadow: "0 8px 32px rgba(80,200,120,0.10)" }} transition={{ type: "spring", stiffness: 300, delay: 0.05 }}>
+              <Card className="text-center hover:shadow-lg transition-shadow bg-green-50 border-0">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Result Processing</h4>
+                  <p className="text-gray-600 text-sm">
+                    Automated result calculation with ranking, percentage, and grade computation
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            <Card className="text-center hover:shadow-lg transition-shadow bg-purple-50 border-0">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Subject Management</h4>
-                <p className="text-gray-600 text-sm">
-                  Multi-language subject support with Arabic text and customizable marking schemes
-                </p>
-              </CardContent>
-            </Card>
+            <motion.div whileHover={{ scale: 1.04, boxShadow: "0 8px 32px rgba(120,80,200,0.10)" }} transition={{ type: "spring", stiffness: 300, delay: 0.1 }}>
+              <Card className="text-center hover:shadow-lg transition-shadow bg-purple-50 border-0">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <GraduationCap className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Subject Management</h4>
+                  <p className="text-gray-600 text-sm">
+                    Multi-language subject support with Arabic text and customizable marking schemes
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            <Card className="text-center hover:shadow-lg transition-shadow bg-orange-50 border-0">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Analytics & Reports</h4>
-                <p className="text-gray-600 text-sm">
-                  Comprehensive reporting with performance analytics and statistical insights
-                </p>
-              </CardContent>
-            </Card>
+            <motion.div whileHover={{ scale: 1.04, boxShadow: "0 8px 32px rgba(240,160,60,0.10)" }} transition={{ type: "spring", stiffness: 300, delay: 0.15 }}>
+              <Card className="text-center hover:shadow-lg transition-shadow bg-orange-50 border-0">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Analytics & Reports</h4>
+                  <p className="text-gray-600 text-sm">
+                    Comprehensive reporting with performance analytics and statistical insights
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Sample Result Preview */}
       {/* <section className="py-16">
@@ -188,7 +220,13 @@ export default function HomePage() {
       </section> */}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <motion.footer
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="bg-gray-900 text-white py-12"
+      >
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -252,7 +290,7 @@ export default function HomePage() {
             </span>
           </div>
         </div>
-      </footer>
-    </div>
+      </motion.footer>
+    </motion.div>
   )
 }
