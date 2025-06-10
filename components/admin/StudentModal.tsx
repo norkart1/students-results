@@ -17,6 +17,7 @@ interface Student {
   email?: string
   phone?: string
   address?: string
+  profilePhoto?: string // new field for photo filename
 }
 
 interface Batch {
@@ -43,12 +44,15 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
   })
   const [batches, setBatches] = useState<Batch[]>([])
   const [loading, setLoading] = useState(false)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen) {
       fetchBatches()
       if (student) {
         setFormData(student)
+        setPhotoPreview(student.profilePhoto ? `/profile-photos/${student.profilePhoto}` : null)
       } else {
         setFormData({
           regNumber: "",
@@ -57,7 +61,9 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
           email: "",
           phone: "",
           address: "",
+          profilePhoto: "",
         })
+        setPhotoPreview(null)
       }
     }
   }, [isOpen, student])
@@ -72,20 +78,37 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
     }
   }
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setPhotoFile(file)
+      setPhotoPreview(URL.createObjectURL(file))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
     try {
+      let profilePhoto = formData.profilePhoto
+      if (photoFile) {
+        // Upload photo to /profile-photos/ via API route
+        const form = new FormData()
+        form.append("file", photoFile)
+        form.append("regNumber", formData.regNumber)
+        const uploadRes = await fetch("/api/students/upload-photo", { method: "POST", body: form })
+        if (uploadRes.ok) {
+          const { filename } = await uploadRes.json()
+          profilePhoto = filename
+        }
+      }
       const url = student ? `/api/students/${student._id}` : "/api/students"
       const method = student ? "PUT" : "POST"
-
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, profilePhoto }),
       })
-
       if (response.ok) {
         onSave()
         onClose()
@@ -158,6 +181,14 @@ export default function StudentModal({ isOpen, onClose, student, onSave }: Stude
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
+          </div>
+
+          <div>
+            <Label htmlFor="profilePhoto">Profile Photo</Label>
+            <Input id="profilePhoto" type="file" accept="image/*" onChange={handlePhotoChange} />
+            {photoPreview && (
+              <img src={photoPreview} alt="Profile Preview" className="mt-2 w-20 h-20 rounded-full object-cover border" />
+            )}
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">

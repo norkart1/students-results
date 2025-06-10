@@ -16,6 +16,7 @@ interface ResultCardProps {
   student: {
     regNumber: string
     name: string
+    profilePhoto?: string // add profilePhoto to student prop
   }
   subjects: Subject[]
   grandTotal: number
@@ -80,7 +81,15 @@ export default function ResultCard({
       {/* Student Info Section */}
       <div className="bg-gray-50 px-8 py-6 border-b-2 border-blue-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 flex items-center space-x-6">
+            <div>
+              <img
+                src={student.profilePhoto ? `/profile-photos/${student.profilePhoto}` : "/images/student-avatar.png"}
+                alt="Profile Photo"
+                className="w-20 h-20 object-cover rounded-full border"
+                onError={(e) => (e.currentTarget.src = "/images/student-avatar.png")}
+              />
+            </div>
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">Student Name</label>
