@@ -20,22 +20,24 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+      <header className="bg-white shadow-sm border-b w-full">
+        <div className="container mx-auto px-2 sm:px-4 py-4">
+          <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
+            <div className="flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
               <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <GraduationCap className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="flex flex-col items-center sm:items-start">
+                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent text-center sm:text-left break-words max-w-full">
                   Result Management System
                 </h1>
-                <p className="text-sm text-gray-600">ASAS MALIKI EXAMINATION</p>
+                <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+                  ASAS MALIKI EXAMINATION
+                </p>
               </div>
             </div>
             {/* <Link href="/admin">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto mt-2 sm:mt-0">
                 Admin Panel
               </Button>
             </Link> */}
