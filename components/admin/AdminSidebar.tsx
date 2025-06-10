@@ -92,7 +92,7 @@ export default function AdminSidebar() {
 					})}
 				</nav>
 				<div className="flex-1" />
-				<div className="px-6 pb-6 mt-auto text-xs text-gray-400">© {new Date().getFullYear()} MIC Results</div>
+				<div className="px-6 pb-6 mt-auto text-xs text-gray-400">© {new Date().getFullYear()} ASAS Results</div>
 			</div>
 		</>
 	)
