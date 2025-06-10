@@ -10,8 +10,11 @@ export async function POST(request: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD
 
   if (username === adminUsername && password === adminPassword) {
-    // Set a session cookie (simple, not secure for production)
-    const res = NextResponse.redirect(new URL(request.nextUrl.searchParams.get('redirect') || '/admin', request.url))
+    // Use NEXTAUTH_URL or fallback to request origin for redirect
+    const redirectParam = request.nextUrl.searchParams.get('redirect') || '/admin'
+    const baseUrl = process.env.NEXTAUTH_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`
+    const redirectUrl = new URL(redirectParam, baseUrl)
+    const res = NextResponse.redirect(redirectUrl)
     res.cookies.set('admin-auth', '1', {
       httpOnly: true,
       path: '/',
@@ -23,7 +26,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Invalid login, redirect back with error
-  const loginUrl = new URL('/admin/login', request.url)
+  const loginUrl = new URL('/admin/login', process.env.NEXTAUTH_URL || request.url)
   loginUrl.searchParams.set('error', '1')
   if (request.nextUrl.searchParams.get('redirect')) {
     loginUrl.searchParams.set('redirect', request.nextUrl.searchParams.get('redirect')!)
