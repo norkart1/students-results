@@ -3,24 +3,29 @@
 import { Bell, Search, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react"
 
 export default function AdminHeader() {
   const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    // Fetch notification count from API
+    // Fetch notification count and list from API
     const fetchNotifications = async () => {
       try {
         const res = await fetch("/api/notifications");
         if (res.ok) {
           const data = await res.json();
           setNotificationCount(data.count || 0);
+          setNotifications(data.notifications || []);
         } else {
           setNotificationCount(0);
+          setNotifications([]);
         }
       } catch {
         setNotificationCount(0);
+        setNotifications([]);
       }
     };
     fetchNotifications();
@@ -37,14 +42,31 @@ export default function AdminHeader() {
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="w-5 h-5" />
-            {notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                {notificationCount}
-              </span>
-            )}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-5 h-5" />
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {notificationCount}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {notifications.length === 0 ? (
+                <DropdownMenuItem disabled>No notifications</DropdownMenuItem>
+              ) : (
+                notifications.slice(0, 5).map((n: any) => (
+                  <DropdownMenuItem key={n._id || n.id} className={!n.read ? "font-semibold" : ""}>
+                    {n.message}
+                  </DropdownMenuItem>
+                ))
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <div className="flex items-center space-x-1 sm:space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
