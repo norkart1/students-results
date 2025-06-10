@@ -206,31 +206,31 @@ export default function ResultPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Action Bar */}
       <div className="no-print bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
               <Link href="/">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Home
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">{result.student.name}</h1>
-                <p className="text-sm text-gray-600">Reg: {result.student.regNumber}</p>
+              <div className="mt-2 sm:mt-0">
+                <h1 className="text-base sm:text-lg font-semibold text-gray-900 break-words max-w-xs sm:max-w-none">{result.student.name}</h1>
+                <p className="text-xs sm:text-sm text-gray-600 break-words">Reg: {result.student.regNumber}</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <Button onClick={handleShare} variant="outline" size="sm">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+              <Button onClick={handleShare} variant="outline" size="sm" className="w-full sm:w-auto">
                 <Share2 className="w-4 h-4 mr-2" />
                 Share
               </Button>
-              <Button onClick={handleDownload} variant="outline" size="sm">
+              <Button onClick={handleDownload} variant="outline" size="sm" className="w-full sm:w-auto">
                 <Download className="w-4 h-4 mr-2" />
                 Download PDF
               </Button>
-              <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700" disabled={printing}>
+              <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" disabled={printing}>
                 <Print className="w-4 h-4 mr-2" />
                 {printing ? "Preparing..." : "Print Result"}
               </Button>
@@ -240,7 +240,7 @@ export default function ResultPage() {
       </div>
 
       {/* Result Content */}
-      <div className="container mx-auto px-4 py-8 print-area">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 print-area">
         <ResultCard
           examTitle={result.batch.examTitle}
           className={result.batch.name}
@@ -254,7 +254,7 @@ export default function ResultPage() {
       </div>
 
       {/* Print-specific footer */}
-      <div className="print:block hidden text-center text-xs text-gray-500 mt-8">
+      <div className="print:block hidden text-center text-xs text-gray-500 mt-4 sm:mt-8 px-2">
         Generated on {new Date().toLocaleString()} | ASAS MALIKI EXAMINATION SYSTEM
       </div>
     </div>
