@@ -3,8 +3,29 @@
 import { Bell, Search, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useEffect, useState } from "react"
 
 export default function AdminHeader() {
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch notification count from API
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch("/api/notifications");
+        if (res.ok) {
+          const data = await res.json();
+          setNotificationCount(data.count || 0);
+        } else {
+          setNotificationCount(0);
+        }
+      } catch {
+        setNotificationCount(0);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
       <div className="flex items-center justify-between">
@@ -18,9 +39,11 @@ export default function AdminHeader() {
         <div className="flex items-center space-x-2 sm:space-x-4">
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              3
-            </span>
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {notificationCount}
+              </span>
+            )}
           </Button>
 
           <div className="flex items-center space-x-1 sm:space-x-2">
