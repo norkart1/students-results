@@ -54,7 +54,7 @@ export async function POST() {
       studentsData.map((student) => ({
         ...student,
         batch: batch._id,
-        email: `${student.name.toLowerCase().replace(/\s+/g, ".")}@student.edu`,
+        email: `${student.name.toLowerCase().replace(/\s+/g, ".")}@miconline.org`,
         phone: `+91${Math.floor(Math.random() * 9000000000) + 1000000000}`,
       })),
     )
