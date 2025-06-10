@@ -237,8 +237,31 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Result Management System. All rights reserved.</p>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm print:hidden flex flex-col md:flex-row items-center justify-center gap-2">
+            <span>
+              &copy; {new Date().getFullYear()} MIC ASAS. All rights reserved.
+            </span>
+            <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
+              Powered by
+              <a href="https://digibayt.com" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-600 hover:underline font-medium flex items-center gap-1">
+                DigiBayt
+                <span className="inline-block align-middle w-4 h-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" width="1em" height="1em" viewBox="0 0 6.827 6.827" style={{ verticalAlign: 'middle' }}>
+                    <g id="Layer_x0020_1">
+                      <g id="_491470016">
+                        <path id="_491470304" fill="none" d="M0 0h6.827v6.827H0z"/>
+                        <path id="_491470064" fill="none" d="M.853.853h5.12v5.12H.853z"/>
+                      </g>
+                      <g id="_491469440">
+                        <path id="_491468960" d="M3.413 1.296c-.68-.462-1.681.015-1.598 1.083-1.457.343-1.14 2.304.157 2.304h1.441V1.296z" style={{ fill: '#00b0ff' }}/>
+                        <path id="_491469608" d="M4.853 4.683c.617 0 1.12-.519 1.12-1.156 0-.597-.41-1.038-.965-1.145-.261-.481-.645-.655-1.17-.568a1.244 1.244 0 0 0-.421-.515l-.004-.003v3.387h1.44z" style={{ fill: '#4fc3f7' }}/>
+                        <path id="_491469464" style={{ fill: '#01579b', fillRule: 'nonzero' }} d="m1.667 3.797.822-.822.822.822-.15.151-.565-.565V5.58h-.214V3.383l-.564.565z"/>
+                      </g>
+                    </g>
+                  </svg>
+                </span>
+              </a>
+            </span>
           </div>
         </div>
       </footer>
