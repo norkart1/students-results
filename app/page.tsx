@@ -20,7 +20,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b w-full">
+      <header className="bg-white shadow-sm border-b w-full sticky top-0 z-30">
         <div className="container mx-auto px-2 sm:px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
             <div className="flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
