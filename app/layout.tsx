@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Asas Results - MIC ASAS',
+  title: 'MIC ASAS - MALIKI EXAMINATION RESULTS',
   description: 'Official Result Management System for MIC ASAS. Check exam results, student performance, and more.',
   icons: {
     icon: '/images/logo.webp',
@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     apple: '/images/logo.webp',
   },
   openGraph: {
-    title: 'Asas Results - MIC ASAS',
+    title: 'MIC ASAS - MALIKI EXAMINATION RESULTS',
     description: 'Official Result Management System for MIC ASAS. Check exam results, student performance, and more.',
     url: 'https://results.miconline.org/',
-    siteName: 'Asas Results - MIC ASAS',
+    siteName: 'MIC ASAS - MALIKI EXAMINATION RESULTS',
     images: [
       {
         url: '/images/logo.webp',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Asas Results - MIC ASAS',
+    title: 'MIC ASAS - MALIKI EXAMINATION RESULTS',
     description: 'Official Result Management System for MIC ASAS. Check exam results, student performance, and more.',
     images: ['/images/logo.webp'],
     site: '@asas_mic',
