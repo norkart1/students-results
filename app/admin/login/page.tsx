@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 export default function AdminLoginPage() {
   // This is a server component, but we'll render a client form
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-2 sm:px-0">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-2">
       <form
         className="bg-white p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-6"
         method="POST"

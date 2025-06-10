@@ -98,7 +98,7 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="space-y-6 px-2 sm:px-0">
+    <div className="space-y-6 px-2 sm:px-0 pb-4">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-2 text-sm sm:text-base">Welcome to the Result Management System</p>
