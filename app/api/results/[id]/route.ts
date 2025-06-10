@@ -36,11 +36,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   try {
     await dbConnect()
     const body = await request.json()
-    const { subjects } = body
-    // Update only the subjects array
+    const { subjects, grandTotal, percentage } = body
+    // If grandTotal/percentage not provided, calculate from subjects
+    let computedGrandTotal = grandTotal
+    let computedPercentage = percentage
+    if (subjects && (grandTotal === undefined || percentage === undefined)) {
+      computedGrandTotal = subjects.reduce((sum: number, subj: any) => sum + (subj.totalMarks || 0), 0)
+      const maxTotal = subjects.reduce((sum: number, subj: any) => sum + (subj.subject?.maxMarks || 100), 0)
+      computedPercentage = maxTotal > 0 ? parseFloat(((computedGrandTotal / maxTotal) * 100).toFixed(2)) : 0
+    }
+    // Update subjects, grandTotal, and percentage
     const result = await Result.findByIdAndUpdate(
       params.id,
-      { subjects },
+      { subjects, grandTotal: computedGrandTotal, percentage: computedPercentage },
       { new: true }
     )
     if (!result) {

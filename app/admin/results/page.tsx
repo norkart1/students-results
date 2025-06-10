@@ -181,10 +181,24 @@ export default function ResultsPage() {
     setEditLoading(true)
     setEditError(null)
     try {
+      // Calculate grandTotal and percentage
+      const grandTotal = editSubjects.reduce((sum, subj) => sum + (subj.totalMarks || 0), 0)
+      // Calculate max possible marks
+      const maxTotal = editSubjects.reduce((sum, subj) => {
+        // Try to get max marks from subject object if available, fallback to 100
+        // You may want to adjust this if you have maxMarks in subj.subject
+        return sum + (subj.subject.maxMarks || 100)
+      }, 0)
+      const percentage = maxTotal > 0 ? parseFloat(((grandTotal / maxTotal) * 100).toFixed(2)) : 0
+
       const response = await fetch(`/api/results/${editResult._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subjects: editSubjects }),
+        body: JSON.stringify({
+          subjects: editSubjects,
+          grandTotal,
+          percentage,
+        }),
       })
       if (!response.ok) throw new Error("Failed to update result")
       closeEditModal()
