@@ -23,6 +23,9 @@ export default function AdminDashboard() {
   const [seeding, setSeeding] = useState(false)
   const [seedMessage, setSeedMessage] = useState("")
 
+  // Fetch recent activity (notifications)
+  const [recentActivity, setRecentActivity] = useState<Array<{ message: string; createdAt: string }>>([])
+
   useEffect(() => {
     // Fetch dynamic stats from API endpoints
     async function fetchStats() {
@@ -55,7 +58,24 @@ export default function AdminDashboard() {
         })
       }
     }
+
+    // Fetch recent activity (notifications)
+    async function fetchRecentActivity() {
+      try {
+        const res = await fetch("/api/notifications")
+        if (res.ok) {
+          const data = await res.json()
+          setRecentActivity(data.notifications || [])
+        } else {
+          setRecentActivity([])
+        }
+      } catch {
+        setRecentActivity([])
+      }
+    }
+
     fetchStats()
+    fetchRecentActivity()
   }, [])
 
   const handleSeedData = async () => {
@@ -224,18 +244,21 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <p className="text-sm text-gray-700">New student registered: Ahmed Ali</p>
-              </div>
-              <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <p className="text-sm text-gray-700">Results published for Batch 2025</p>
-              </div>
-              <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <p className="text-sm text-gray-700">New subject added: Islamic Studies</p>
-              </div>
+              {recentActivity.length === 0 ? (
+                <div className="text-gray-500 text-sm">No recent activity.</div>
+              ) : (
+                recentActivity.slice(0, 5).map((activity, idx) => (
+                  <div key={activity.createdAt + idx} className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="flex flex-col">
+                      <p className="text-sm text-gray-700">{activity.message}</p>
+                      <span className="text-xs text-gray-400">
+                        {new Date(activity.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
