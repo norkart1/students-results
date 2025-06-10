@@ -32,7 +32,7 @@ async function seedData() {
     name: "NIHAYA 2",
     year: 2025,
     semester: "First Semester",
-    examTitle: "ASAS MALIKI EXAMINATION FIRST SEMESTER MAY-JUNE 2025",
+    examTitle: "ASAS MALIKI FINAL SEMESTER EXAMINATION 2024-2025",
     subjects: subjects.map((s) => s._id),
   })
 

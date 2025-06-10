@@ -159,7 +159,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto">
             <Card className="shadow-2xl overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 text-center">
-                <h4 className="text-xl font-bold">ASAS MALIKI EXAMINATION FIRST SEMESTER MAY-JUNE 2025</h4>
+                <h4 className="text-xl font-bold">ASAS MALIKI FINAL SEMESTER EXAMINATION 2024-2025</h4>
               </div>
               <div className="bg-gray-100 p-3 text-center border-b">
                 <h5 className="font-bold">RESULT - SAMPLE FORMAT</h5>
