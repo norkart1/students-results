@@ -57,6 +57,13 @@ export default function ResultsPage() {
   const [editSubjects, setEditSubjects] = useState<SubjectMark[]>([])
   const [editLoading, setEditLoading] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addStudentId, setAddStudentId] = useState<string>("")
+  const [addBatchId, setAddBatchId] = useState<string>("")
+  const [addSubjects, setAddSubjects] = useState<SubjectMark[]>([])
+  const [addLoading, setAddLoading] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
+  const [students, setStudents] = useState<any[]>([])
 
   useEffect(() => {
     fetchData()
@@ -65,6 +72,31 @@ export default function ResultsPage() {
   useEffect(() => {
     filterResults()
   }, [results, searchTerm, selectedBatch])
+
+  // Fetch students for add modal
+  useEffect(() => {
+    if (addModalOpen && students.length === 0) {
+      fetch("/api/students").then(res => res.json()).then(setStudents)
+    }
+  }, [addModalOpen])
+
+  // Fetch subjects for selected batch
+  useEffect(() => {
+    if (addBatchId) {
+      fetch(`/api/subjects?batch=${addBatchId}`)
+        .then(res => res.json())
+        .then(subjects => {
+          setAddSubjects(subjects.map((s: any) => ({
+            subject: s,
+            writtenMarks: 0,
+            ceMarks: 0,
+            totalMarks: 0
+          })))
+        })
+    } else {
+      setAddSubjects([])
+    }
+  }, [addBatchId])
 
   const fetchData = async () => {
     try {
@@ -210,6 +242,49 @@ export default function ResultsPage() {
     }
   }
 
+  const handleAddSubjectMarkChange = (idx: number, field: string, value: number) => {
+    setAddSubjects(prev => prev.map((subj, i) =>
+      i === idx ? { ...subj, [field]: value, totalMarks: field === "writtenMarks" || field === "ceMarks" ? (field === "writtenMarks" ? value : subj.writtenMarks) + (field === "ceMarks" ? value : subj.ceMarks) : subj.totalMarks } : subj
+    ))
+  }
+
+  const handleAddSave = async () => {
+    setAddLoading(true)
+    setAddError(null)
+    try {
+      const grandTotal = addSubjects.reduce((sum, subj) => sum + (subj.totalMarks || 0), 0)
+      const maxTotal = addSubjects.reduce((sum, subj) => {
+        // Try to get max marks from subject object if available, fallback to 100
+        // You may want to adjust this if you have maxWritten and maxCE in subj.subject
+        const maxWritten = subj.subject.maxWritten || 0
+        const maxCE = subj.subject.maxCE || 0
+        return sum + (maxWritten + maxCE > 0 ? maxWritten + maxCE : 100)
+      }, 0)
+      const percentage = maxTotal > 0 ? parseFloat(((grandTotal / maxTotal) * 100).toFixed(2)) : 0
+      const response = await fetch("/api/results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student: addStudentId,
+          batch: addBatchId,
+          subjects: addSubjects,
+          grandTotal,
+          percentage
+        })
+      })
+      if (!response.ok) throw new Error("Failed to add result")
+      setAddModalOpen(false)
+      setAddStudentId("")
+      setAddBatchId("")
+      setAddSubjects([])
+      fetchData()
+    } catch (err) {
+      setAddError("Failed to add result. Please try again.")
+    } finally {
+      setAddLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -258,7 +333,7 @@ export default function ResultsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Results</h1>
           <p className="text-gray-600 mt-2">Manage student examination results</p>
         </div>
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" onClick={() => setAddModalOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add Result
         </Button>
@@ -413,6 +488,89 @@ export default function ResultsPage() {
               </div>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Result Modal */}
+      <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
+        <DialogContent className="max-w-2xl w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Result</DialogTitle>
+          </DialogHeader>
+          {addError && <div className="text-red-500 mb-2">{addError}</div>}
+          <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleAddSave(); }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Student</Label>
+                <Select value={addStudentId} onValueChange={setAddStudentId} required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select student" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {students.map((s) => (
+                      <SelectItem key={s._id} value={s._id}>{s.name} ({s.regNumber})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Batch</Label>
+                <Select value={addBatchId} onValueChange={setAddBatchId} required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select batch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {batches.map((batch) => (
+                      <SelectItem key={batch._id} value={batch._id}>{batch.name} - {batch.year}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {addSubjects.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {addSubjects.map((subj, idx) => (
+                  <div key={subj.subject._id} className="border rounded p-3 bg-gray-50 flex flex-col gap-2 shadow-sm">
+                    <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>{subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span></div>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Label className="w-24 min-w-max">Written</Label>
+                      <Input
+                        type="number"
+                        value={subj.writtenMarks}
+                        min={0}
+                        onChange={e => handleAddSubjectMarkChange(idx, "writtenMarks", Number(e.target.value))}
+                        className="w-full sm:w-24"
+                        required
+                        inputMode="numeric"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Label className="w-24 min-w-max">CE</Label>
+                      <Input
+                        type="number"
+                        value={subj.ceMarks}
+                        min={0}
+                        onChange={e => handleAddSubjectMarkChange(idx, "ceMarks", Number(e.target.value))}
+                        className="w-full sm:w-24"
+                        required
+                        inputMode="numeric"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Label className="w-24 min-w-max">Total</Label>
+                      <Input type="number" value={subj.totalMarks} readOnly className="w-full sm:w-24 bg-gray-100" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setAddModalOpen(false)} className="w-full sm:w-auto">Cancel</Button>
+              <Button type="submit" disabled={addLoading} className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600">
+                {addLoading ? "Saving..." : "Save Result"}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
