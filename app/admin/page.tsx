@@ -24,13 +24,38 @@ export default function AdminDashboard() {
   const [seedMessage, setSeedMessage] = useState("")
 
   useEffect(() => {
-    // Simulate fetching stats
-    setStats({
-      totalStudents: 150,
-      totalSubjects: 8,
-      totalBatches: 5,
-      totalResults: 120,
-    })
+    // Fetch dynamic stats from API endpoints
+    async function fetchStats() {
+      try {
+        const [studentsRes, subjectsRes, batchesRes, resultsRes] = await Promise.all([
+          fetch("/api/students"),
+          fetch("/api/subjects"),
+          fetch("/api/batches"),
+          fetch("/api/results"),
+        ])
+        const [studentsData, subjectsData, batchesData, resultsData] = await Promise.all([
+          studentsRes.json(),
+          subjectsRes.json(),
+          batchesRes.json(),
+          resultsRes.json(),
+        ])
+        setStats({
+          totalStudents: studentsData.total || studentsData.count || studentsData.length || 0,
+          totalSubjects: subjectsData.total || subjectsData.count || subjectsData.length || 0,
+          totalBatches: batchesData.total || batchesData.count || batchesData.length || 0,
+          totalResults: resultsData.total || resultsData.count || resultsData.length || 0,
+        })
+      } catch (err) {
+        // fallback to 0 if error
+        setStats({
+          totalStudents: 0,
+          totalSubjects: 0,
+          totalBatches: 0,
+          totalResults: 0,
+        })
+      }
+    }
+    fetchStats()
   }, [])
 
   const handleSeedData = async () => {
@@ -60,7 +85,15 @@ export default function AdminDashboard() {
         setSeedMessage(`❌ Error: ${data.error}`)
       }
     } catch (error) {
-      setSeedMessage(`❌ Failed to seed data: ${error.message}`)
+      let message = ""
+      if (error instanceof Error) {
+        message = error.message
+      } else if (typeof error === "string") {
+        message = error
+      } else {
+        message = JSON.stringify(error)
+      }
+      setSeedMessage(`❌ Failed to seed data: ${message}`)
     } finally {
       setSeeding(false)
     }
