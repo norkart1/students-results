@@ -37,6 +37,12 @@ export default function AdminLoginPage() {
       >
         Login
       </button>
+      <a
+        href="/"
+        className="block w-full mt-4 text-center text-blue-600 hover:underline text-sm sm:text-base"
+      >
+        ← Back to Home
+      </a>
     </form>
   )
 }
