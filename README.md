@@ -36,23 +36,44 @@ A modern, full-featured academic result management system for schools and instit
 
 ```
 ├── app/
-│   ├── admin/           # Admin dashboard and management pages
-│   ├── api/             # API routes (students, subjects, batches, results, reports, seed, etc.)
-│   ├── result/          # Public result card view
-│   ├── globals.css      # Main global styles
-│   └── ...
-├── components/          # Reusable UI and admin components
-│   └── ui/              # UI primitives (button, card, table, etc.)
-├── hooks/               # Custom React hooks
-├── lib/                 # Utility libraries (e.g., MongoDB connection)
-├── models/              # Mongoose models (Student, Subject, Batch, Result)
-├── public/              # Static assets (images, logos, signature)
-├── scripts/             # Data seeding scripts
-├── styles/              # Additional global styles
-├── tailwind.config.ts   # Tailwind CSS configuration
-├── package.json         # Project dependencies and scripts
-└── ...
+│   ├── admin/               # Admin dashboard and management pages (students, batches, results, reports, settings, etc.)
+│   ├── admin-login/         # Admin authentication (login/logout)
+│   ├── api/                 # API routes for all core entities and system features
+│   ├── result/              # Public result card view (dynamic route for each student)
+│   ├── globals.css          # Main global styles (Tailwind CSS)
+│   ├── layout.tsx           # Root layout for the app
+│   └── ...                  # Other app-level files and folders
+├── components/
+│   ├── admin/               # Admin-specific UI components (header, sidebar, modals, etc.)
+│   ├── ui/                  # Reusable UI primitives (button, card, table, toast, etc.)
+│   ├── ResultCard.tsx       # Main result card component
+│   └── theme-provider.tsx   # Theme/dark mode provider
+├── hooks/                   # Custom React hooks (e.g., use-toast, use-mobile)
+├── lib/                     # Utility libraries (e.g., MongoDB connection, helpers)
+├── models/                  # Mongoose models (Student, Subject, Batch, Result, Notification)
+├── public/                  # Static assets (images, logos, SVGs, placeholder avatars)
+│   └── images/              # Project images (logo, signature, backgrounds, etc.)
+├── scripts/                 # Data seeding and utility scripts
+├── styles/                  # Additional global styles
+├── tailwind.config.ts       # Tailwind CSS configuration
+├── next.config.mjs          # Next.js configuration
+├── tsconfig.json            # TypeScript configuration
+├── package.json             # Project dependencies and scripts
+├── middleware.ts            # Next.js middleware (if any)
+└── ...                      # Other config and support files
 ```
+
+- **app/**: Main application code, including all pages, API routes, and layouts. Uses the Next.js App Router.
+- **components/**: All React components, organized by feature and UI primitives for reusability.
+- **hooks/**: Custom hooks to encapsulate logic and state management.
+- **lib/**: Utility functions and database connection logic.
+- **models/**: Mongoose schemas/models for MongoDB collections.
+- **public/**: Static files served directly (images, SVGs, avatars, etc.).
+- **scripts/**: Scripts for seeding demo data and other utilities.
+- **styles/**: Additional CSS files (if needed beyond Tailwind).
+- **Configuration files**: Tailwind, Next.js, TypeScript, and package management.
+
+This structure supports scalability, modularity, and maintainability for a modern full-stack Next.js application.
 
 ---
 
