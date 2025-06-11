@@ -250,19 +250,19 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  {/* <Link href="/admin/students" className="hover:text-white transition-colors">
+                  <Link href="/admin/students" className="hover:text-white transition-colors">
                     Student Management
-                  </Link> */}
+                  </Link>
                 </li>
                 <li>
-                  {/* <Link href="/admin/results" className="hover:text-white transition-colors">
+                  <Link href="/admin/results" className="hover:text-white transition-colors">
                     Results
-                  </Link> */}
+                  </Link>
                 </li>
                 <li>
-                  {/* <Link href="/admin/reports" className="hover:text-white transition-colors">
+                  <Link href="/admin/reports" className="hover:text-white transition-colors">
                     Reports
-                  </Link> */}
+                  </Link>
                 </li>
               </ul>
             </div>
