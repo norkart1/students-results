@@ -144,9 +144,16 @@ pnpm exec tsx scripts/seed-data.js
 
 ## 📦 Sample `.env.local`
 ```env
-MONGODB_URI=mongodb://localhost:27017/result-management-system
-NEXT_PUBLIC_SITE_NAME=ASAS MALIKI EXAMINATION
-ADMIN_EMAIL=micthrissur@gmail.com
+MONGODB_URI=mongodb://localhost:27017/mic-asas-results
+NEXT_PUBLIC_SITE_NAME=ASAS MALIKI EXAMINATION RESULTS
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=changeme
+NEXTAUTH_SECRET=asas-results-2025
+NEXTAUTH_URL=http://localhost:3000
+
+SUPABASE_URL=https://your-supabase-project-url.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
 ---
