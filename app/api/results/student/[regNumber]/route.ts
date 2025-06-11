@@ -29,8 +29,24 @@ export async function GET(request: NextRequest, { params }: { params: { regNumbe
       return NextResponse.json({ error: "Result not found" }, { status: 404 })
     }
 
-    console.log("Result found for student:", result.student.name)
-    return NextResponse.json(result)
+    // Attach the correct public profile photo URL if available
+    let profilePhotoUrl = null;
+    if (student.profilePhoto) {
+      // If already a public URL (from Supabase), use as is
+      if (student.profilePhoto.startsWith("http")) {
+        profilePhotoUrl = student.profilePhoto;
+      } else {
+        // Otherwise, assume it's a filename in Supabase avatars bucket
+        const supabaseUrl = process.env.SUPABASE_URL;
+        profilePhotoUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${student.profilePhoto}`;
+      }
+    }
+
+    // Attach profilePhotoUrl to the student object in the result
+    const resultObj = result.toObject();
+    resultObj.student.profilePhoto = profilePhotoUrl;
+
+    return NextResponse.json(resultObj)
   } catch (error) {
     console.error("API Error:", error)
     return NextResponse.json({ error: "Failed to fetch result" }, { status: 500 })

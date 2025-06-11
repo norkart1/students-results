@@ -84,7 +84,7 @@ export default function ResultCard({
           <div className="md:col-span-2 flex items-center space-x-6">
             <div>
               <img
-                src={student.profilePhoto ? `/profile-photos/${student.profilePhoto}` : "/images/student-avatar.png"}
+                src={student.profilePhoto || "/images/student-avatar.png"}
                 alt="Profile Photo"
                 className="w-20 h-20 object-cover rounded-full border"
                 onError={(e) => (e.currentTarget.src = "/images/student-avatar.png")}
