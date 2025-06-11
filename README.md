@@ -6,15 +6,29 @@ A modern, full-featured academic result management system for schools and instit
 
 ## 🚀 Features
 
-- **Student Management**: Register, update, and manage student records with batch assignments.
+- **Student Management**: Register, update, and manage student records with batch assignments, including profile photo support.
 - **Subject Management**: Define subjects (with Arabic names supported), codes, and mark schemes.
 - **Batch/Class Management**: Organize students into batches/classes and manage batch-specific exams.
-- **Result Processing**: Automated calculation of total marks, percentages, grades, and ranks.
+- **Result Processing**: Automated calculation of total marks, percentages, grades, and ranks. Customizable grading scale and rank suffixes (st, nd, rd, th).
+- **Result Cards**: Professionally formatted, printable result cards for students, including:
+  - Subject-wise marks breakdown (written, CE, total)
+  - Subject names in English and Arabic
+  - Color-coded performance bars for each subject
+  - Student profile photo and details
+  - Class rank with ordinal suffix
+  - Overall performance bar and grade
+  - Principal's signature (SVG image)
+  - Performance analysis/remarks auto-generated based on percentage
+  - Publication date auto-filled
 - **Reports & Analytics**: Visualize performance with charts, grade distributions, subject analytics, and batch comparisons.
 - **Admin Panel**: Secure admin dashboard for managing all data, seeding sample data, and system status.
-- **Result Cards**: Professionally formatted, printable result cards for students.
 - **Data Export/Backup**: (Coming soon) Export data for backup or migration.
 - **Responsive UI**: Mobile-friendly, modern interface with dark mode support.
+- **Customizable Branding**: Easily update site name, logo, and principal's signature via static assets and environment variables.
+- **API Endpoints**: RESTful API for all core entities (students, subjects, batches, results, reports, seeding, system status).
+- **Sample Data Seeding**: Load demo data via admin panel or CLI script.
+- **Error Handling & Validation**: Robust validation for forms and API routes.
+- **Accessibility**: Uses accessible UI primitives (Radix UI, shadcn/ui).
 
 ---
 
@@ -32,7 +46,7 @@ A modern, full-featured academic result management system for schools and instit
 ├── hooks/               # Custom React hooks
 ├── lib/                 # Utility libraries (e.g., MongoDB connection)
 ├── models/              # Mongoose models (Student, Subject, Batch, Result)
-├── public/              # Static assets (images, logos)
+├── public/              # Static assets (images, logos, signature)
 ├── scripts/             # Data seeding scripts
 ├── styles/              # Additional global styles
 ├── tailwind.config.ts   # Tailwind CSS configuration
@@ -107,9 +121,24 @@ pnpm exec tsx scripts/seed-data.js
 - **Next.js** (App Router, API routes)
 - **TypeScript**
 - **MongoDB** (with Mongoose)
+- **Supabase** ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)
 - **Tailwind CSS**
 - **Radix UI** & **shadcn/ui**
 - **Recharts** (analytics)
+
+---
+
+## 🆕 Recent Enhancements
+
+- **Principal's Signature Widget**: SVG signature image is now displayed on result cards for authenticity.
+- **Profile Photo Support**: Student avatars/photos shown on result cards and admin panel.
+- **Dynamic Performance Analysis**: Auto-generated remarks based on student percentage.
+- **Ordinal Rank Suffixes**: Class rank now displays with correct English ordinal (1st, 2nd, 3rd, etc.).
+- **Arabic Subject Names**: Full support for Arabic subject names and right-to-left display.
+- **Color-coded Performance Bars**: Visual feedback for both subject-wise and overall performance.
+- **Auto-filled Result Date**: Result publication date is shown automatically on result cards.
+- **Robust Error Handling**: Improved validation and error messages across forms and APIs.
+- **Supabase Integration**: Added support for Supabase as a backend service for authentication, storage, or real-time features (if applicable to your project setup).
 
 ---
 
@@ -136,3 +165,4 @@ This project is for educational and demonstration purposes. Please contact the a
 ## 🌟 Acknowledgements
 - Inspired by real-world academic result management needs.
 - UI powered by [shadcn/ui](https://ui.shadcn.com/) and [Radix UI](https://www.radix-ui.com/).
+- Backend and real-time features powered by [Supabase](https://supabase.com/).
