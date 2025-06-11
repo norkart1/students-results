@@ -29,23 +29,48 @@ export async function GET(request: NextRequest, { params }: { params: { regNumbe
       return NextResponse.json({ error: "Result not found" }, { status: 404 })
     }
 
-    // Attach the correct public profile photo URL if available
+    // --- Ensure rank is up-to-date for this batch ---
+    if (result.batch) {
+      const batchResults = await Result.find({ batch: result.batch })
+        .sort({ percentage: -1, grandTotal: -1 })
+      for (let i = 0; i < batchResults.length; i++) {
+        batchResults[i].rank = i + 1
+        await batchResults[i].save()
+      }
+      // Refetch the result to get the updated rank and all populated fields
+      const updatedResult = await Result.findOne({ student: student._id })
+        .populate("student")
+        .populate("batch")
+        .populate("subjects.subject")
+      if (updatedResult) {
+        let profilePhotoUrl = null;
+        if (student.profilePhoto) {
+          if (student.profilePhoto.startsWith("http")) {
+            profilePhotoUrl = student.profilePhoto;
+          } else {
+            const supabaseUrl = process.env.SUPABASE_URL;
+            profilePhotoUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${student.profilePhoto}`;
+          }
+        }
+        const resultObj = updatedResult.toObject();
+        resultObj.student.profilePhoto = profilePhotoUrl;
+        return NextResponse.json(resultObj)
+      }
+    }
+    // --- End rank update ---
+
+    // Attach profilePhotoUrl to the student object in the result (fallback)
     let profilePhotoUrl = null;
     if (student.profilePhoto) {
-      // If already a public URL (from Supabase), use as is
       if (student.profilePhoto.startsWith("http")) {
         profilePhotoUrl = student.profilePhoto;
       } else {
-        // Otherwise, assume it's a filename in Supabase avatars bucket
         const supabaseUrl = process.env.SUPABASE_URL;
         profilePhotoUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${student.profilePhoto}`;
       }
     }
-
-    // Attach profilePhotoUrl to the student object in the result
     const resultObj = result.toObject();
     resultObj.student.profilePhoto = profilePhotoUrl;
-
     return NextResponse.json(resultObj)
   } catch (error) {
     console.error("API Error:", error)

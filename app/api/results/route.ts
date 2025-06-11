@@ -38,12 +38,26 @@ export async function POST(request: NextRequest) {
       percentage: Math.round(percentage * 10) / 10,
     })
 
+    // Recalculate ranks for all results in the same batch
+    const batchResults = await Result.find({ batch: result.batch })
+      .sort({ percentage: -1, grandTotal: -1 })
+    for (let i = 0; i < batchResults.length; i++) {
+      batchResults[i].rank = i + 1
+      await batchResults[i].save()
+    }
+
+    // Refetch the created result with the updated rank and populated fields
+    const updatedResult = await Result.findById(result._id)
+      .populate("student")
+      .populate("batch")
+      .populate("subjects.subject")
+
     // Create notification for new result/marks entry
     await Notification.create({
       message: `Result added for student: ${result.student?.name || result.student || "Unknown"}`,
     })
 
-    return NextResponse.json(result, { status: 201 })
+    return NextResponse.json(updatedResult, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: "Failed to create result" }, { status: 500 })
   }

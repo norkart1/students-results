@@ -55,6 +55,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (!result) {
       return NextResponse.json({ error: "Result not found" }, { status: 404 })
     }
+    // Recalculate ranks for all results in the same batch
+    const batchResults = await Result.find({ batch: result.batch })
+      .sort({ percentage: -1, grandTotal: -1 })
+    for (let i = 0; i < batchResults.length; i++) {
+      batchResults[i].rank = i + 1
+      await batchResults[i].save()
+    }
     // Create notification for result update
     await Notification.create({
       message: `Result updated for student: ${result.student?.name || result.student || "Unknown"}`,
