@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, Edit, Trash2 } from "lucide-react"
 import StudentModal from "@/components/admin/StudentModal"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 interface Student {
   _id: string
@@ -17,6 +18,19 @@ interface Student {
   }
   email?: string
   phone?: string
+  profilePhoto?: string // Add this field for avatar
+}
+
+// Helper type for modal compatibility
+interface StudentForModal {
+  _id?: string
+  regNumber: string
+  name: string
+  batch: string
+  email?: string
+  phone?: string
+  address?: string
+  profilePhoto?: string
 }
 
 export default function StudentsPage() {
@@ -24,7 +38,7 @@ export default function StudentsPage() {
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [selectedStudent, setSelectedStudent] = useState<StudentForModal | null>(null)
 
   useEffect(() => {
     fetchStudents()
@@ -43,7 +57,13 @@ export default function StudentsPage() {
     try {
       const response = await fetch("/api/students")
       const data = await response.json()
-      setStudents(data)
+      // Convert batch to object if needed
+      setStudents(
+        data.map((s: any) => ({
+          ...s,
+          batch: typeof s.batch === "string" ? { name: "", year: 0 } : s.batch,
+        })),
+      )
     } catch (error) {
       console.error("Failed to fetch students:", error)
     }
@@ -61,7 +81,15 @@ export default function StudentsPage() {
   }
 
   const handleEdit = (student: Student) => {
-    setSelectedStudent(student)
+    setSelectedStudent({
+      _id: student._id,
+      regNumber: student.regNumber,
+      name: student.name,
+      batch: (student.batch as any)?._id || "",
+      email: student.email,
+      phone: student.phone,
+      profilePhoto: (student as any).profilePhoto || "",
+    })
     setIsModalOpen(true)
   }
 
@@ -117,7 +145,22 @@ export default function StudentsPage() {
               <tbody>
                 {filteredStudents.map((student) => (
                   <tr key={student._id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-blue-600">{student.regNumber}</td>
+                    <td className="py-3 px-4 font-medium text-blue-600 flex items-center gap-2">
+                      <Avatar className="w-8 h-8 mr-2">
+                        <AvatarImage
+                          src={student.profilePhoto || "/placeholder-user.jpg"}
+                          alt={student.name}
+                        />
+                        <AvatarFallback>
+                          {student.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      {student.regNumber}
+                    </td>
                     <td className="py-3 px-4">{student.name}</td>
                     <td className="py-3 px-4">
                       {student.batch?.name} - {student.batch?.year}
