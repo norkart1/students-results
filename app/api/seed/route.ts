@@ -23,7 +23,7 @@ export async function POST() {
       { name: "BUKHARI", nameArabic: "بخاری", code: "BUK", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
       { name: "MUSLIM", nameArabic: "مسلم", code: "MUS", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
       { name: "IBNU MAJAH", nameArabic: "ابن ماجہ ونسائی", code: "IBN", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
-      { name: "TURMUDHY", nameArabic: "ترمذی", code: "TUR", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
+      { name: "TUHFA", nameArabic: "تحفة", code: "TUH", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
       { name: "JAM", nameArabic: "جمع", code: "JAM", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
       { name: "LANGUAGE", nameArabic: "اللغة", code: "LANG", maxMarks: 100, writtenMarks: 90, ceMarks: 10 },
     ])
