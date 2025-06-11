@@ -289,7 +289,8 @@ export default function ResultCard({
             <div className="space-y-2">
               <p className="text-sm text-gray-700">Result Published: {new Date().toLocaleDateString()}</p>
               <div className="mt-4 pt-4 border-t border-gray-300">
-                <p className="text-xs text-gray-500">Principal's Signature</p>
+                <img src="/images/signature.svg" alt="Principal's Signature" className="h-10 mx-auto mb-1" />
+                <p className="text-xs text-gray-500 text-center">Principal's Signature</p>
               </div>
             </div>
           </div>
