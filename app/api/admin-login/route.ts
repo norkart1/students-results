@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Invalid login, redirect back with error
-  const loginUrl = new URL('/admin/login', process.env.NEXTAUTH_URL || request.url)
+  const loginUrl = new URL('/admin-login', process.env.NEXTAUTH_URL || request.url)
   loginUrl.searchParams.set('error', '1')
   if (request.nextUrl.searchParams.get('redirect')) {
     loginUrl.searchParams.set('redirect', request.nextUrl.searchParams.get('redirect')!)

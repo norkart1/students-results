@@ -83,7 +83,7 @@ export default function AdminHeader() {
               try {
                 const res = await fetch('/api/admin-logout', { method: 'POST' });
                 if (res.ok) {
-                  window.location.href = '/admin/login';
+                  window.location.href = '/admin-login';
                 } else {
                   alert('Logout failed.');
                 }
