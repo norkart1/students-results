@@ -44,10 +44,10 @@ export const metadata: Metadata = {
   
   authors: [
     { name: 'Salman MP', url: 'https://salmanmp.me' },
-    { name: 'MIC ASAS Development Team' }
+    { name: 'DigiBayt Development Team' }
   ],
   creator: 'Salman MP',
-  publisher: 'MIC ASAS - Academy of Sharia and Advanced Studies',
+  publisher: 'DigiBayt - The Complete Digital Destination',
   
   openGraph: {
     title: 'MIC ASAS - MALIKI EXAMINATION RESULTS | Official Result Portal',
@@ -212,7 +212,10 @@ export default function RootLayout({
                 "addressLocality": "Thrissur",
                 "addressRegion": "Kerala",
                 "postalCode": "680001",
-                "addressCountry": "IN"
+                "addressCountry": {
+                  "@type": "Country",
+                  "name": "India"
+                }
               },
               "geo": {
                 "@type": "GeoCoordinates",
@@ -227,7 +230,7 @@ export default function RootLayout({
               }, {
                 "@type": "ContactPoint",
                 "contactType": "Admissions",
-                "telephone": "+91-91422-91442",
+                "telephone": "++91-91422-91442",
                 "availableLanguage": ["English", "Malayalam", "Arabic"]
               }],
               "offers": {
@@ -263,7 +266,10 @@ export default function RootLayout({
                       "addressLocality": "Thrissur",
                       "addressRegion": "Kerala",
                       "postalCode": "680001",
-                      "addressCountry": "IN"
+                      "addressCountry": {
+                        "@type": "Country",
+                        "name": "India"
+                      }
                     }
                   },
                   "instructor": {
@@ -301,7 +307,10 @@ export default function RootLayout({
                       "addressLocality": "Thrissur",
                       "addressRegion": "Kerala",
                       "postalCode": "680001",
-                      "addressCountry": "IN"
+                      "addressCountry": {
+                        "@type": "Country",
+                        "name": "India"
+                      }
                     }
                   },
                   "instructor": {
