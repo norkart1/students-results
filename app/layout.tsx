@@ -114,7 +114,7 @@ export const metadata: Metadata = {
   },
   
   verification: {
-    google: 'VB95l7bSVpC6PWBVDTFlYSaE0e6F4sPsjT',
+    google: 'VB95l7bSVpC6PWBVDTFlYSaE0e6F4sPsjTvCFlwBQ40',
     yandex: 'your-yandex-verification-code',
     yahoo: 'your-yahoo-verification-code',
     other: {
@@ -208,9 +208,16 @@ export default function RootLayout({
               ],
               "address": {
                 "@type": "PostalAddress",
+                "streetAddress": "Shakthan Nagar, near Heart Hospital",
                 "addressLocality": "Thrissur",
                 "addressRegion": "Kerala",
+                "postalCode": "680001",
                 "addressCountry": "IN"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 10.512250721059875,
+                "longitude": 76.21373803031281
               },
               "contactPoint": [{
                 "@type": "ContactPoint",
@@ -246,14 +253,16 @@ export default function RootLayout({
                 "hasCourseInstance": {
                   "@type": "CourseInstance",
                   "courseMode": "onsite",
-                  "courseWorkload": "P1Y", // 1 year duration
+                  "courseWorkload": "P1Y",
                   "location": {
                     "@type": "Place",
                     "name": "MIC ASAS Campus",
                     "address": {
                       "@type": "PostalAddress",
+                      "streetAddress": "Shakthan Nagar, near Heart Hospital",
                       "addressLocality": "Thrissur",
                       "addressRegion": "Kerala",
+                      "postalCode": "680001",
                       "addressCountry": "IN"
                     }
                   },
@@ -282,14 +291,16 @@ export default function RootLayout({
                 "hasCourseInstance": {
                   "@type": "CourseInstance",
                   "courseMode": "onsite",
-                  "courseWorkload": "P2Y", // 2 years duration
+                  "courseWorkload": "P2Y",
                   "location": {
                     "@type": "Place",
                     "name": "MIC ASAS Campus",
                     "address": {
                       "@type": "PostalAddress",
+                      "streetAddress": "Shakthan Nagar, near Heart Hospital",
                       "addressLocality": "Thrissur",
                       "addressRegion": "Kerala",
+                      "postalCode": "680001",
                       "addressCountry": "IN"
                     }
                   },
@@ -351,8 +362,8 @@ export default function RootLayout({
         
         <meta name="geo.region" content="IN-KL" />
         <meta name="geo.placename" content="Thrissur, Kerala" />
-        <meta name="geo.position" content="10.5276;76.2144" />
-        <meta name="ICBM" content="10.5276, 76.2144" />
+        <meta name="geo.position" content="10.512250721059875;76.21373803031281" />
+        <meta name="ICBM" content="10.512250721059875, 76.21373803031281" />
         
         <meta httpEquiv="content-language" content="en-us" />
         <meta name="content-type" content="text/html; charset=utf-8" />
@@ -378,8 +389,10 @@ export default function RootLayout({
           <span itemProp="url">https://miconline.org/</span>
           <span itemProp="logo">https://results.miconline.org/images/logo.webp</span>
           <div itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+            <span itemProp="streetAddress">Shakthan Nagar, near Heart Hospital</span>
             <span itemProp="addressLocality">Thrissur</span>
             <span itemProp="addressRegion">Kerala</span>
+            <span itemProp="postalCode">680001</span>
             <span itemProp="addressCountry">India</span>
           </div>
         </div>
