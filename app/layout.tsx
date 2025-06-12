@@ -291,7 +291,7 @@ export default function RootLayout({
                 "coursePrerequisites": "Basic Islamic Knowledge"
               }, {
                 "@type": "Course",
-                "name": "NIHAYA Program",
+                "name": "Maliki Program",
                 "description": "Advanced Islamic studies program with comprehensive curriculum",
                 "provider": {
                   "@type": "EducationalOrganization",
