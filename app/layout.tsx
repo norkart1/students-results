@@ -9,31 +9,23 @@ export const metadata: Metadata = {
   description: 'Official Result Management System for MIC ASAS (Academy of Sharia and Advanced Studies). Check exam results, student performance, marksheets, and academic records. Access NIHAYA and ASAS MALIKI examination results online.',
   applicationName: 'MIC ASAS Results Portal',
   
-  // Enhanced keywords with long-tail and local SEO
   keywords: [
-    // Primary keywords
     'MIC ASAS',
     'ASAS Results',
     'Academy of Sharia and Advanced Studies',
     'MIC Results',
     'ASAS MALIKI',
     'NIHAYA Results',
-    
-    // Academic terms
     'Islamic Education Results',
     'Madrasa Results',
     'Islamic College Kerala',
     'Arabic Education Results',
     'Islamic Studies Results',
     'Dars Nizami Results',
-    
-    // Location-based
     'Thrissur Islamic College',
     'Kerala Islamic Education',
     'Malappuram Islamic College',
     'Kerala Madrasa Results',
-    
-    // Functional keywords
     'Online Result Portal',
     'Student Marksheet',
     'Academic Performance',
@@ -42,8 +34,6 @@ export const metadata: Metadata = {
     'Student Portal',
     'Grade Report',
     'Academic Records',
-    
-    // Specific searches
     'MIC ASAS Thrissur',
     'ASAS Results Check',
     'Islamic College Results Online',
@@ -59,7 +49,6 @@ export const metadata: Metadata = {
   creator: 'Salman MP',
   publisher: 'MIC ASAS - Academy of Sharia and Advanced Studies',
   
-  // Comprehensive Open Graph
   openGraph: {
     title: 'MIC ASAS - MALIKI EXAMINATION RESULTS | Official Result Portal',
     description: 'Official Result Management System for MIC ASAS (Academy of Sharia and Advanced Studies). Check exam results, student performance, and academic records online.',
@@ -87,7 +76,6 @@ export const metadata: Metadata = {
     emails: ['info@miconline.org'],
   },
   
-  // Enhanced Twitter Card
   twitter: {
     card: 'summary_large_image',
     title: 'MIC ASAS - MALIKI EXAMINATION RESULTS | Official Result Portal',
@@ -97,7 +85,6 @@ export const metadata: Metadata = {
     creator: '@asas_mic',
   },
   
-  // Enhanced robots configuration
   robots: {
     index: true,
     follow: true,
@@ -112,7 +99,6 @@ export const metadata: Metadata = {
     },
   },
   
-  // Additional SEO enhancements
   alternates: {
     canonical: 'https://results.miconline.org/',
     languages: {
@@ -121,16 +107,14 @@ export const metadata: Metadata = {
     },
   },
   
-  // App-specific metadata
   appleWebApp: {
     capable: true,
     title: 'MIC ASAS Results',
     statusBarStyle: 'default',
   },
   
-  // Verification tags (add your actual verification codes)
   verification: {
-    google: 'your-google-verification-code',
+    google: 'VB95l7bSVpC6PWBVDTFlYSaE0e6F4sPsjT',
     yandex: 'your-yandex-verification-code',
     yahoo: 'your-yahoo-verification-code',
     other: {
@@ -138,16 +122,14 @@ export const metadata: Metadata = {
     },
   },
   
-  // Category and classification
   category: 'Education',
   classification: 'Educational Institution Result Portal',
   
-  // Structured data hints
   other: {
     'og:site_name': 'MIC ASAS Results Portal',
     'og:locale:alternate': 'en_GB',
     'article:publisher': 'https://www.facebook.com/asasmic',
-    'fb:app_id': 'your-facebook-app-id', // Add if you have one
+    'fb:app_id': 'your-facebook-app-id',
   },
   
   icons: {
@@ -180,7 +162,6 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <head>
-        {/* Enhanced favicon and icons */}
         <link rel="icon" href="/images/logo.webp" type="image/webp" sizes="32x32" />
         <link rel="icon" href="/images/logo.webp" type="image/webp" sizes="16x16" />
         <link rel="apple-touch-icon" href="/images/logo.webp" sizes="180x180" />
@@ -188,7 +169,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/images/logo.webp" sizes="144x144" />
         <link rel="apple-touch-icon-precomposed" href="/images/logo.webp" />
         
-        {/* Theme and mobile optimization */}
         <meta name="theme-color" content="#3b82f6" />
         <meta name="msapplication-TileColor" content="#3b82f6" />
         <meta name="msapplication-TileImage" content="/images/logo.webp" />
@@ -196,23 +176,18 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         
-        {/* Enhanced viewport and mobile */}
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
         <meta name="format-detection" content="telephone=yes" />
         
-        {/* Contact Information Meta Tags */}
         <meta name="contact" content="+91-487-2445828" />
         <meta name="phone" content="+91-487-2445828" />
         <meta name="telephone" content="+91-487-2445828" />
         
-        {/* Preconnect to external domains for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Canonical URL */}
         <link rel="canonical" href="https://results.miconline.org/" />
         
-        {/* Organization Schema - Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -270,7 +245,8 @@ export default function RootLayout({
                 },
                 "hasCourseInstance": {
                   "@type": "CourseInstance",
-                  "courseMode": "In-person",
+                  "courseMode": "onsite",
+                  "courseWorkload": "P1Y", // 1 year duration
                   "location": {
                     "@type": "Place",
                     "name": "MIC ASAS Campus",
@@ -305,7 +281,8 @@ export default function RootLayout({
                 },
                 "hasCourseInstance": {
                   "@type": "CourseInstance",
-                  "courseMode": "In-person",
+                  "courseMode": "onsite",
+                  "courseWorkload": "P2Y", // 2 years duration
                   "location": {
                     "@type": "Place",
                     "name": "MIC ASAS Campus",
@@ -328,7 +305,6 @@ export default function RootLayout({
           }}
         />
         
-        {/* Website Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -352,7 +328,6 @@ export default function RootLayout({
           }}
         />
         
-        {/* Breadcrumb Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -374,27 +349,22 @@ export default function RootLayout({
           }}
         />
         
-        {/* Additional meta tags for local SEO */}
         <meta name="geo.region" content="IN-KL" />
         <meta name="geo.placename" content="Thrissur, Kerala" />
         <meta name="geo.position" content="10.5276;76.2144" />
         <meta name="ICBM" content="10.5276, 76.2144" />
         
-        {/* Language and content meta */}
         <meta httpEquiv="content-language" content="en-us" />
         <meta name="content-type" content="text/html; charset=utf-8" />
         
-        {/* Security headers */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
         
-        {/* Performance hints */}
         <link rel="dns-prefetch" href="//results.miconline.org" />
         <link rel="preload" href="/images/logo.webp" as="image" type="image/webp" />
       </head>
       <body className="min-h-screen bg-gray-50">
-        {/* Skip to main content for accessibility */}
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white px-4 py-2 z-50">
           Skip to main content
         </a>
@@ -403,7 +373,6 @@ export default function RootLayout({
           {children}
         </main>
         
-        {/* Organization microdata for additional SEO */}
         <div itemScope itemType="https://schema.org/EducationalOrganization" style={{ display: 'none' }}>
           <span itemProp="name">MIC ASAS - Academy of Sharia and Advanced Studies</span>
           <span itemProp="url">https://miconline.org/</span>
