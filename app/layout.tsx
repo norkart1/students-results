@@ -256,7 +256,7 @@ export default function RootLayout({
               },
               "course": [{
                 "@type": "Course",
-                "name": "Islamic Studies - ASAS Program",
+                "name": "Islamic Studies - Maliki Program",
                 "description": "Comprehensive Islamic education program offering traditional Islamic studies curriculum",
                 "provider": {
                   "@type": "EducationalOrganization",
