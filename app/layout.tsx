@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     default: 'MIC ASAS - MALIKI EXAMINATION RESULTS | Official Result Portal',
     template: '%s | MIC ASAS Results'
   },
-  description: 'Official Result Management System for MIC ASAS (Maliki Islamic College). Check exam results, student performance, marksheets, and academic records. Access NIHAYA and ASAS MALIKI examination results online.',
+  description: 'Official Result Management System for MIC ASAS (Academy of Sharia and Advanced Studies). Check exam results, student performance, marksheets, and academic records. Access NIHAYA and ASAS MALIKI examination results online.',
   applicationName: 'MIC ASAS Results Portal',
   
   // Enhanced keywords with long-tail and local SEO
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     // Primary keywords
     'MIC ASAS',
     'ASAS Results',
-    'Maliki Islamic College',
+    'Academy of Sharia and Advanced Studies',
     'MIC Results',
     'ASAS MALIKI',
     'NIHAYA Results',
@@ -54,15 +54,15 @@ export const metadata: Metadata = {
   
   authors: [
     { name: 'Salman MP', url: 'https://salmanmp.me' },
-    { name: 'DigiBayt Development Team' }
+    { name: 'MIC ASAS Development Team' }
   ],
   creator: 'Salman MP',
-  publisher: 'DigiBayt Development Team',
+  publisher: 'MIC ASAS - Academy of Sharia and Advanced Studies',
   
   // Comprehensive Open Graph
   openGraph: {
     title: 'MIC ASAS - MALIKI EXAMINATION RESULTS | Official Result Portal',
-    description: 'Official Result Management System for MIC ASAS (Maliki Islamic College). Check exam results, student performance, and academic records online.',
+    description: 'Official Result Management System for MIC ASAS (Academy of Sharia and Advanced Studies). Check exam results, student performance, and academic records online.',
     url: 'https://results.miconline.org/',
     siteName: 'MIC ASAS Results Portal',
     images: [
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
         url: 'https://results.miconline.org/images/logo.webp',
         width: 1200,
         height: 630,
-        alt: 'MIC ASAS - Maliki Islamic College Results Portal Logo',
+        alt: 'MIC ASAS - Academy of Sharia and Advanced Studies Results Portal Logo',
         type: 'image/webp',
       },
       {
@@ -198,7 +198,12 @@ export default function RootLayout({
         
         {/* Enhanced viewport and mobile */}
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
-        <meta name="format-detection" content="telephone=no" />
+        <meta name="format-detection" content="telephone=yes" />
+        
+        {/* Contact Information Meta Tags */}
+        <meta name="contact" content="+91-487-2445828" />
+        <meta name="phone" content="+91-487-2445828" />
+        <meta name="telephone" content="+91-487-2445828" />
         
         {/* Preconnect to external domains for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -214,9 +219,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
-              "name": "MIC ASAS - Maliki Islamic College",
-              "alternateName": ["MIC ASAS", "ASAS MALIKI", "Maliki Islamic College"],
-              "description": "Official Result Management System for MIC ASAS (Maliki Islamic College). Islamic education institution providing quality education in Kerala, India.",
+              "name": "MIC ASAS - Academy of Sharia and Advanced Studies",
+              "alternateName": ["MIC ASAS", "ASAS MALIKI", "Academy of Sharia and Advanced Studies"],
+              "description": "Official Result Management System for MIC ASAS (Academy of Sharia and Advanced Studies). Islamic education institution providing quality education in Kerala, India.",
               "url": "https://miconline.org/",
               "logo": "https://results.miconline.org/images/logo.webp",
               "image": "https://results.miconline.org/images/logo.webp",
@@ -232,23 +237,93 @@ export default function RootLayout({
                 "addressRegion": "Kerala",
                 "addressCountry": "IN"
               },
-              "contactPoint": {
+              "contactPoint": [{
                 "@type": "ContactPoint",
                 "contactType": "Customer Service",
+                "telephone": "+91-487-2445828",
                 "availableLanguage": ["English", "Malayalam", "Arabic"]
+              }, {
+                "@type": "ContactPoint",
+                "contactType": "Admissions",
+                "telephone": "+91-91422-91442",
+                "availableLanguage": ["English", "Malayalam", "Arabic"]
+              }],
+              "offers": {
+                "@type": "Offer",
+                "category": "Educational Services",
+                "name": "Islamic Education Programs",
+                "description": "Comprehensive Islamic education and examination services"
               },
-              "hasOfferCatalog": {
-                "@type": "OfferCatalog",
-                "name": "Educational Services",
-                "itemListElement": [{
+              "course": [{
+                "@type": "Course",
+                "name": "Islamic Studies - ASAS Program",
+                "description": "Comprehensive Islamic education program offering traditional Islamic studies curriculum",
+                "provider": {
+                  "@type": "EducationalOrganization",
+                  "name": "MIC ASAS - Academy of Sharia and Advanced Studies",
+                  "url": "https://miconline.org/"
+                },
+                "offers": {
                   "@type": "Offer",
-                  "itemOffered": {
-                    "@type": "Course",
-                    "name": "Islamic Studies",
-                    "description": "Comprehensive Islamic education programs"
+                  "category": "Educational Program",
+                  "availability": "https://schema.org/InStock"
+                },
+                "hasCourseInstance": {
+                  "@type": "CourseInstance",
+                  "courseMode": "In-person",
+                  "location": {
+                    "@type": "Place",
+                    "name": "MIC ASAS Campus",
+                    "address": {
+                      "@type": "PostalAddress",
+                      "addressLocality": "Thrissur",
+                      "addressRegion": "Kerala",
+                      "addressCountry": "IN"
+                    }
+                  },
+                  "instructor": {
+                    "@type": "Organization",
+                    "name": "MIC ASAS Faculty"
                   }
-                }]
-              }
+                },
+                "educationalLevel": "Higher Education",
+                "teaches": "Islamic Studies, Arabic Language, Quranic Studies",
+                "coursePrerequisites": "Basic Islamic Knowledge"
+              }, {
+                "@type": "Course",
+                "name": "NIHAYA Program",
+                "description": "Advanced Islamic studies program with comprehensive curriculum",
+                "provider": {
+                  "@type": "EducationalOrganization",
+                  "name": "MIC ASAS - Academy of Sharia and Advanced Studies",
+                  "url": "https://miconline.org/"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "category": "Educational Program",
+                  "availability": "https://schema.org/InStock"
+                },
+                "hasCourseInstance": {
+                  "@type": "CourseInstance",
+                  "courseMode": "In-person",
+                  "location": {
+                    "@type": "Place",
+                    "name": "MIC ASAS Campus",
+                    "address": {
+                      "@type": "PostalAddress",
+                      "addressLocality": "Thrissur",
+                      "addressRegion": "Kerala",
+                      "addressCountry": "IN"
+                    }
+                  },
+                  "instructor": {
+                    "@type": "Organization",
+                    "name": "MIC ASAS Faculty"
+                  }
+                },
+                "educationalLevel": "Advanced",
+                "teaches": "Advanced Islamic Studies, Islamic Jurisprudence, Arabic Literature"
+              }]
             })
           }}
         />
@@ -265,7 +340,7 @@ export default function RootLayout({
               "url": "https://results.miconline.org/",
               "publisher": {
                 "@type": "Organization",
-                "name": "MIC ASAS - Maliki Islamic College",
+                "name": "MIC ASAS - Academy of Sharia and Advanced Studies",
                 "logo": "https://results.miconline.org/images/logo.webp"
               },
               "potentialAction": {
@@ -330,7 +405,7 @@ export default function RootLayout({
         
         {/* Organization microdata for additional SEO */}
         <div itemScope itemType="https://schema.org/EducationalOrganization" style={{ display: 'none' }}>
-          <span itemProp="name">MIC ASAS - Maliki Islamic College</span>
+          <span itemProp="name">MIC ASAS - Academy of Sharia and Advanced Studies</span>
           <span itemProp="url">https://miconline.org/</span>
           <span itemProp="logo">https://results.miconline.org/images/logo.webp</span>
           <div itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
