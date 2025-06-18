@@ -94,11 +94,9 @@ export default function ResultsPage() {
         .then(subjects => {
           setAddSubjects(subjects.map((s: any) => ({
             subject: s,
-            marks: {
-              W: 0,
-              CE: 0,
-              T: 0
-            }
+            marks: Object.fromEntries(
+              (s.scoringScheme || []).map((comp: any) => [comp.key, 0])
+            )
           })))
         })
     } else {
@@ -250,10 +248,22 @@ export default function ResultsPage() {
     }
   }
 
-  const handleAddSubjectMarkChange = (idx: number, field: string, value: number) => {
-    setAddSubjects(prev => prev.map((subj, i) =>
-      i === idx ? { ...subj, marks: { ...subj.marks, [field]: value } } : subj
-    ))
+  // Auto-calculate computed fields (like Total) in addSubjects
+  const handleAddSubjectMarkChange = (idx: number, key: string, value: number) => {
+    setAddSubjects(prev => prev.map((subj, i) => {
+      if (i !== idx) return subj
+      const newMarks = { ...subj.marks, [key]: value }
+      // If subject has a computed Total, recalculate it
+      const totalComp = (subj.subject.scoringScheme || []).find((c: any) => !!c.computed && (c.key && (c.key.toLowerCase() === 't' || (c.label && c.label.toLowerCase() === 'total'))))
+      if (totalComp && totalComp.key) {
+        // Sum all non-computed fields
+        const sum = (subj.subject.scoringScheme || [])
+          .filter((c: any) => !c.computed)
+          .reduce((acc: number, c: any) => acc + (Number(newMarks[c.key]) || 0), 0)
+        newMarks[totalComp.key] = sum
+      }
+      return { ...subj, marks: newMarks }
+    }))
   }
 
   const handleAddSave = async () => {
@@ -539,35 +549,25 @@ export default function ResultsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {addSubjects.map((subj, idx) => (
                   <div key={subj.subject._id} className="border rounded p-3 bg-gray-50 flex flex-col gap-2 shadow-sm">
-                    <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>{subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span></div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Label className="w-24 min-w-max">Written</Label>
-                      <Input
-                        type="number"
-                        value={subj.marks.W}
-                        min={0}
-                        onChange={e => handleAddSubjectMarkChange(idx, "W", Number(e.target.value))}
-                        className="w-full sm:w-24"
-                        required
-                        inputMode="numeric"
-                      />
+                    <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>
+                      {subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span>
                     </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Label className="w-24 min-w-max">CE</Label>
-                      <Input
-                        type="number"
-                        value={subj.marks.CE}
-                        min={0}
-                        onChange={e => handleAddSubjectMarkChange(idx, "CE", Number(e.target.value))}
-                        className="w-full sm:w-24"
-                        required
-                        inputMode="numeric"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Label className="w-24 min-w-max">Total</Label>
-                      <Input type="number" value={subj.marks.T} readOnly className="w-full sm:w-24 bg-gray-100" />
-                    </div>
+                    {(subj.subject.scoringScheme || []).map((comp: any) => (
+                      <div key={comp.key} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <Label className="w-24 min-w-max">{comp.label}</Label>
+                        <Input
+                          type="number"
+                          value={subj.marks[comp.key] ?? 0}
+                          min={0}
+                          onChange={e => handleAddSubjectMarkChange(idx, comp.key, Number(e.target.value))}
+                          className="w-full sm:w-24"
+                          required={!comp.computed}
+                          inputMode="numeric"
+                          readOnly={!!comp.computed}
+                          style={comp.computed ? { background: '#f3f4f6' } : {}}
+                        />
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
