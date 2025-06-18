@@ -76,8 +76,8 @@ export default function SubjectModal({ isOpen, onClose, subject, onSave }: Subje
     }
   }, [isOpen, subject])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setLoading(true)
 
     try {
@@ -112,10 +112,7 @@ export default function SubjectModal({ isOpen, onClose, subject, onSave }: Subje
           </DialogTitle>
         </DialogHeader>
         <form
-          onSubmit={async (e) => {
-            e.preventDefault()
-            await handleSubmit()
-          }}
+          onSubmit={handleSubmit}
           className="space-y-5"
         >
           <div className="space-y-2">
