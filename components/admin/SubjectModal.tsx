@@ -105,121 +105,131 @@ export default function SubjectModal({ isOpen, onClose, subject, onSave }: Subje
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg w-full p-6 rounded-xl shadow-lg bg-white dark:bg-zinc-900">
         <DialogHeader>
-          <DialogTitle>{subject ? "Edit Subject" : "Add New Subject"}</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold mb-2">
+            {subject ? "Edit Subject" : "Add New Subject"}
+          </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault()
+            await handleSubmit()
+          }}
+          className="space-y-5"
+        >
+          <div className="space-y-2">
             <Label htmlFor="code">Subject Code</Label>
             <Input
               id="code"
               value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+              onChange={e => setFormData({ ...formData, code: e.target.value })}
+              placeholder="e.g. IT, BUK, MUS"
               required
+              className="rounded-md border px-3 py-2 text-base"
             />
           </div>
-
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="name">Subject Name (English)</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. Information Technology"
               required
+              className="rounded-md border px-3 py-2 text-base"
             />
           </div>
-
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="nameArabic">Subject Name (Arabic)</Label>
             <Input
               id="nameArabic"
               value={formData.nameArabic}
-              onChange={(e) => setFormData({ ...formData, nameArabic: e.target.value })}
-              className="arabic-text text-lg"
-              dir="rtl"
+              onChange={e => setFormData({ ...formData, nameArabic: e.target.value })}
+              placeholder="اسم الموضوع بالعربية"
               required
+              className="rounded-md border px-3 py-2 text-base"
+              dir="rtl"
             />
           </div>
-
-          {/* Add UI for editing scoringScheme */}
-          <div className="mb-4">
+          <div className="space-y-2">
             <Label>Scoring Scheme</Label>
-            {scoringScheme.map((component, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
-                <Input
-                  className="w-24"
-                  placeholder="Key"
-                  value={component.key}
-                  onChange={e => {
-                    const updated = [...scoringScheme]
-                    updated[idx].key = e.target.value
-                    setScoringScheme(updated)
-                  }}
-                />
-                <Input
-                  className="w-32"
-                  placeholder="Label"
-                  value={component.label}
-                  onChange={e => {
-                    const updated = [...scoringScheme]
-                    updated[idx].label = e.target.value
-                    setScoringScheme(updated)
-                  }}
-                />
-                <Input
-                  className="w-20"
-                  placeholder="Max"
-                  type="number"
-                  value={component.max ?? ''}
-                  onChange={e => {
-                    const updated = [...scoringScheme]
-                    updated[idx].max = e.target.value ? Number(e.target.value) : undefined
-                    setScoringScheme(updated)
-                  }}
-                  disabled={component.computed}
-                />
-                <label className="flex items-center gap-1 text-xs">
-                  <input
-                    type="checkbox"
-                    checked={!!component.computed}
+            <div className="flex flex-col gap-2">
+              {scoringScheme.map((component, idx) => (
+                <div key={idx} className="flex flex-wrap items-center gap-2 bg-zinc-50 dark:bg-zinc-800 rounded-md p-2">
+                  <Input
+                    className="w-16 text-sm"
+                    placeholder="Key"
+                    value={component.key}
                     onChange={e => {
                       const updated = [...scoringScheme]
-                      updated[idx].computed = e.target.checked
+                      updated[idx].key = e.target.value
                       setScoringScheme(updated)
                     }}
-                  /> Computed
-                </label>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => {
-                    setScoringScheme(scoringScheme.filter((_, i) => i !== idx))
-                  }}
-                  disabled={scoringScheme.length <= 1}
-                >
-                  ×
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setScoringScheme([...scoringScheme, { key: '', label: '', max: undefined, computed: false }])}
-            >
-              + Add Component
-            </Button>
+                    required
+                  />
+                  <Input
+                    className="w-28 text-sm"
+                    placeholder="Label"
+                    value={component.label}
+                    onChange={e => {
+                      const updated = [...scoringScheme]
+                      updated[idx].label = e.target.value
+                      setScoringScheme(updated)
+                    }}
+                    required
+                  />
+                  <Input
+                    className="w-20 text-sm"
+                    placeholder="Max"
+                    type="number"
+                    value={component.max ?? ''}
+                    onChange={e => {
+                      const updated = [...scoringScheme]
+                      updated[idx].max = e.target.value ? Number(e.target.value) : undefined
+                      setScoringScheme(updated)
+                    }}
+                    disabled={component.computed}
+                    min={0}
+                  />
+                  <label className="flex items-center gap-1 text-xs select-none">
+                    <input
+                      type="checkbox"
+                      checked={!!component.computed}
+                      onChange={e => {
+                        const updated = [...scoringScheme]
+                        updated[idx].computed = e.target.checked
+                        setScoringScheme(updated)
+                      }}
+                    /> Computed
+                  </label>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    type="button"
+                    className="ml-2"
+                    onClick={() => setScoringScheme(scoringScheme.filter((_, i) => i !== idx))}
+                    disabled={scoringScheme.length <= 1}
+                    aria-label="Remove component"
+                  >
+                    ×
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-fit mt-1"
+                onClick={() => setScoringScheme([...scoringScheme, { key: '', label: '', max: undefined, computed: false }])}
+              >
+                + Add Component
+              </Button>
+            </div>
           </div>
-
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-blue-500 to-purple-600">
-              {loading ? "Saving..." : "Save"}
-            </Button>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={onClose} className="px-6">Cancel</Button>
+            <Button type="submit" className="px-8 font-semibold">Save</Button>
           </div>
         </form>
       </DialogContent>
