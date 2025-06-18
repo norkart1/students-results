@@ -190,19 +190,34 @@ export default function ResultsPage() {
     return "bg-gray-200 text-gray-700"
   }
 
-  const openEditModal = (result: Result) => {
+  const openEditModal = async (result: Result) => {
     setEditResult(result)
-    // Fetch full result with subjects if not present
-    fetch(`/api/results/${result._id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setEditSubjects(data.subjects || [])
-        setEditModalOpen(true)
+    try {
+      // Fetch full result with subjects and batch info
+      const [resultRes, batchRes] = await Promise.all([
+        fetch(`/api/results/${result._id}`),
+        fetch(`/api/batches/${result.batch._id}`)
+      ])
+      const resultData = await resultRes.json()
+      const batchData = await batchRes.json()
+      // batchData.subjects is an array of subject IDs
+      // Fetch subject details for these IDs
+      const subjectsRes = await fetch(`/api/subjects?ids=${batchData.subjects.join(",")}`)
+      const subjects = await subjectsRes.json()
+      // Merge: for each subject in batch, find marks in result (if any)
+      const mergedSubjects = subjects.map((s: any) => {
+        const found = (resultData.subjects || []).find((subj: any) => subj.subject._id === s._id || subj.subject === s._id)
+        return {
+          subject: s,
+          marks: found ? found.marks : Object.fromEntries((s.scoringScheme || []).map((comp: any) => [comp.key, 0]))
+        }
       })
-      .catch(() => {
-        setEditSubjects([])
-        setEditModalOpen(true)
-      })
+      setEditSubjects(mergedSubjects)
+      setEditModalOpen(true)
+    } catch {
+      setEditSubjects([])
+      setEditModalOpen(true)
+    }
   }
 
   const closeEditModal = () => {
@@ -472,35 +487,24 @@ export default function ResultsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {editSubjects.map((subj, idx) => (
                   <div key={subj.subject._id} className="border rounded p-3 bg-gray-50 flex flex-col gap-2 shadow-sm">
-                    <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>{subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span></div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Label className="w-24 min-w-max">Written</Label>
-                      <Input
-                        type="number"
-                        value={subj.marks.W}
-                        min={0}
-                        onChange={e => handleSubjectMarkChange(idx, "W", Number(e.target.value))}
-                        className="w-full sm:w-24"
-                        required
-                        inputMode="numeric"
-                      />
+                    <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>
+                      {subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span>
                     </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Label className="w-24 min-w-max">CE</Label>
-                      <Input
-                        type="number"
-                        value={subj.marks.CE}
-                        min={0}
-                        onChange={e => handleSubjectMarkChange(idx, "CE", Number(e.target.value))}
-                        className="w-full sm:w-24"
-                        required
-                        inputMode="numeric"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Label className="w-24 min-w-max">Total</Label>
-                      <Input type="number" value={subj.marks.T} readOnly className="w-full sm:w-24 bg-gray-100" />
-                    </div>
+                    {(subj.subject.scoringScheme || []).map((comp: any) => (
+                      <div key={comp.key} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <Label className="w-24 min-w-max">{comp.label}</Label>
+                        <Input
+                          type="number"
+                          value={subj.marks?.[comp.key] ?? ''}
+                          min={0}
+                          onChange={e => handleSubjectMarkChange(idx, comp.key, Number(e.target.value))}
+                          className="w-full sm:w-24"
+                          required={!comp.computed}
+                          inputMode="numeric"
+                          readOnly={!!comp.computed}
+                        />
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
