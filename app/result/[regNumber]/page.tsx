@@ -8,30 +8,42 @@ import { Download, PrinterIcon as Print, Share2, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 
+interface ScoringComponent {
+  key: string;
+  label: string;
+  max?: number;
+  computed?: boolean;
+}
+
 interface ResultData {
   student: {
-    regNumber: string
-    name: string
-  }
+    regNumber: string;
+    name: string;
+  };
   batch: {
-    name: string
-    examTitle: string
-  }
+    name: string;
+    examTitle: string;
+  };
   subjects: Array<{
     subject: {
-      name: string
-      nameArabic: string
-      maxMarks: number
-      writtenMarks: number
-      ceMarks: number
-    }
-    writtenMarks: number
-    ceMarks: number
-    totalMarks: number
-  }>
-  grandTotal: number
-  percentage: number
-  rank: number
+      name: string;
+      nameArabic: string;
+      scoringScheme: ScoringComponent[];
+    };
+    marks: Record<string, number>;
+  }>;
+  grandTotal: number;
+  percentage: number;
+  rank: number;
+}
+
+interface SubjectMark {
+  subject: {
+    name: string;
+    nameArabic: string;
+    scoringScheme: ScoringComponent[];
+  };
+  marks: Record<string, number>;
 }
 
 export default function ResultPage() {
@@ -192,14 +204,14 @@ export default function ResultPage() {
     )
   }
 
-  const subjects = result.subjects.map((s) => ({
-    name: s.subject.name,
-    nameArabic: s.subject.nameArabic,
-    writtenMarks: s.writtenMarks,
-    ceMarks: s.ceMarks,
-    totalMarks: s.totalMarks,
-    maxWritten: s.subject.writtenMarks,
-    maxCE: s.subject.ceMarks,
+  // When mapping API data to subjects, transform to new structure:
+  const subjects: SubjectMark[] = (result?.subjects || []).map((s) => ({
+    subject: {
+      name: s.subject.name,
+      nameArabic: s.subject.nameArabic,
+      scoringScheme: s.subject.scoringScheme,
+    },
+    marks: s.marks,
   }))
 
   return (

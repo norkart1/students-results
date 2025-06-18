@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Users, BookOpen, GraduationCap, FileText, BarChart3, Settings, Home, Database } from "lucide-react"
-import React from "react"
+import React, { useState } from "react"
 
 const menuItems = [
 	{ href: "/admin", icon: Home, label: "Dashboard" },
@@ -12,19 +12,57 @@ const menuItems = [
 	{ href: "/admin/batches", icon: GraduationCap, label: "Batches" },
 	{ href: "/admin/results", icon: FileText, label: "Results" },
 	{ href: "/admin/reports", icon: BarChart3, label: "Reports" },
-	{ href: "/admin/system-status", icon: Database, label: "System Status" },
-	{ href: "/admin/settings", icon: Settings, label: "Settings" },
+	{ href: "/admin/user-management", icon: Users, label: "User Management", superadminOnly: true },
+	{ href: "/admin/system-status", icon: Database, label: "System Status", superadminOnly: true },
+	{ href: "/admin/settings", icon: Settings, label: "Settings", superadminOnly: true },
 ]
+
+function useAdminRole() {
+	if (typeof window !== 'undefined') {
+		const envUser = process.env.NEXT_PUBLIC_ADMIN_USERNAME || process.env.ADMIN_USERNAME;
+		const currentUser = window.localStorage.getItem('adminUsername');
+		if (currentUser && envUser && currentUser === envUser) {
+			return 'envsuperadmin'; // special role for env admin
+		}
+		const role = window.localStorage.getItem('adminRole') || 'admin';
+		const restrict = window.localStorage.getItem('sidebarRestrict');
+		if (restrict === 'no') return 'all';
+		return role;
+	}
+	return 'admin';
+}
 
 export default function AdminSidebar() {
 	// Responsive sidebar state
 	const [open, setOpen] = React.useState(false)
 	const pathname = usePathname()
+	const [superadminLoading, setSuperadminLoading] = useState(false)
+	const [superadminMsg, setSuperadminMsg] = useState("")
 
 	// Close sidebar on route change (mobile)
 	React.useEffect(() => {
 		setOpen(false)
 	}, [pathname])
+
+	const role = useAdminRole();
+
+	const handleSetSuperadmin = async () => {
+		setSuperadminLoading(true)
+		setSuperadminMsg("")
+		try {
+			const res = await fetch("/api/admins/create-superadmin", { method: "POST" })
+			const data = await res.json()
+			if (res.ok) {
+				setSuperadminMsg("Default admin set as superadmin!")
+				window.location.reload()
+			} else {
+				setSuperadminMsg(data.error || "Failed to set superadmin")
+			}
+		} catch (e) {
+			setSuperadminMsg("Error occurred")
+		}
+		setSuperadminLoading(false)
+	}
 
 	return (
 		<>
@@ -70,7 +108,7 @@ export default function AdminSidebar() {
 					</div>
 				</div>
 				<nav className="mt-4 flex flex-col gap-1 px-2">
-					{menuItems.map((item) => {
+					{menuItems.filter(item => !item.superadminOnly || role === 'superadmin' || role === 'envsuperadmin' || role === 'all').map((item) => {
 						const Icon = item.icon
 						const isActive = pathname === item.href
 
@@ -90,6 +128,15 @@ export default function AdminSidebar() {
 							</Link>
 						)
 					})}
+					{/* Button to set default admin as superadmin */}
+					<button
+						onClick={handleSetSuperadmin}
+						disabled={superadminLoading}
+						className="mt-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-xl font-semibold shadow hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-60"
+					>
+						{superadminLoading ? "Setting Superadmin..." : "Set Default Admin as Superadmin"}
+					</button>
+					{superadminMsg && <div className="text-xs text-center text-blue-700 mt-2">{superadminMsg}</div>}
 				</nav>
 				<div className="flex-1" />
 				<div className="px-6 pb-6 mt-auto text-xs text-gray-400">© {new Date().getFullYear()} ASAS Results</div>

@@ -7,14 +7,19 @@ import { Input } from "@/components/ui/input"
 import { Plus, Search, Edit, Trash2 } from "lucide-react"
 import SubjectModal from "@/components/admin/SubjectModal"
 
+interface ScoringComponent {
+  key: string
+  label: string
+  max?: number
+  computed?: boolean
+}
+
 interface Subject {
   _id: string
   name: string
   nameArabic: string
   code: string
-  maxMarks: number
-  writtenMarks: number
-  ceMarks: number
+  scoringScheme: ScoringComponent[]
 }
 
 export default function SubjectsPage() {
@@ -107,9 +112,7 @@ export default function SubjectsPage() {
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Code</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Arabic Name</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Written Marks</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">CE Marks</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Total</th>
+                  <th className="py-2 px-4">Scoring Scheme</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
                 </tr>
               </thead>
@@ -119,9 +122,9 @@ export default function SubjectsPage() {
                     <td className="py-3 px-4 font-medium text-blue-600">{subject.code}</td>
                     <td className="py-3 px-4">{subject.name}</td>
                     <td className="py-3 px-4 arabic-text text-lg">{subject.nameArabic}</td>
-                    <td className="py-3 px-4">{subject.writtenMarks}</td>
-                    <td className="py-3 px-4">{subject.ceMarks}</td>
-                    <td className="py-3 px-4 font-semibold">{subject.maxMarks}</td>
+                    <td className="py-3 px-4">
+                      {subject.scoringScheme.map((comp) => `${comp.label}${comp.max ? ` (${comp.max})` : ''}`).join(' + ')}
+                    </td>
                     <td className="py-3 px-4">
                       <div className="flex space-x-2">
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(subject)}>

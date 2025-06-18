@@ -33,15 +33,21 @@ interface Batch {
   year: number
 }
 
+interface ScoringComponent {
+  // Define the structure of your scoring component here
+  // For example:
+  type: string; // 'W' | 'CE' | 'T' | etc.
+  maxMarks: number;
+}
+
 interface SubjectMark {
   subject: {
-    _id: string
-    name: string
-    code: string
-  }
-  writtenMarks: number
-  ceMarks: number
-  totalMarks: number
+    _id: string;
+    name: string;
+    code: string;
+    scoringScheme: ScoringComponent[];
+  };
+  marks: Record<string, number>; // e.g., { W: 80, CE: 10, T: 90 }
 }
 
 export default function ResultsPage() {
@@ -88,9 +94,11 @@ export default function ResultsPage() {
         .then(subjects => {
           setAddSubjects(subjects.map((s: any) => ({
             subject: s,
-            writtenMarks: 0,
-            ceMarks: 0,
-            totalMarks: 0
+            marks: {
+              W: 0,
+              CE: 0,
+              T: 0
+            }
           })))
         })
     } else {
@@ -203,7 +211,7 @@ export default function ResultsPage() {
   const handleSubjectMarkChange = (idx: number, field: string, value: number) => {
     setEditSubjects((prev) =>
       prev.map((subj, i) =>
-        i === idx ? { ...subj, [field]: value, totalMarks: field === "writtenMarks" || field === "ceMarks" ? (field === "writtenMarks" ? value : subj.writtenMarks) + (field === "ceMarks" ? value : subj.ceMarks) : subj.totalMarks } : subj
+        i === idx ? { ...subj, marks: { ...subj.marks, [field]: value } } : subj
       )
     )
   }
@@ -214,7 +222,7 @@ export default function ResultsPage() {
     setEditError(null)
     try {
       // Calculate grandTotal and percentage
-      const grandTotal = editSubjects.reduce((sum, subj) => sum + (subj.totalMarks || 0), 0)
+      const grandTotal = editSubjects.reduce((sum, subj) => sum + (subj.marks.T || 0), 0)
       // Calculate max possible marks
       const maxTotal = editSubjects.reduce((sum, subj) => {
         // Try to get max marks from subject object if available, fallback to 100
@@ -244,7 +252,7 @@ export default function ResultsPage() {
 
   const handleAddSubjectMarkChange = (idx: number, field: string, value: number) => {
     setAddSubjects(prev => prev.map((subj, i) =>
-      i === idx ? { ...subj, [field]: value, totalMarks: field === "writtenMarks" || field === "ceMarks" ? (field === "writtenMarks" ? value : subj.writtenMarks) + (field === "ceMarks" ? value : subj.ceMarks) : subj.totalMarks } : subj
+      i === idx ? { ...subj, marks: { ...subj.marks, [field]: value } } : subj
     ))
   }
 
@@ -252,7 +260,7 @@ export default function ResultsPage() {
     setAddLoading(true)
     setAddError(null)
     try {
-      const grandTotal = addSubjects.reduce((sum, subj) => sum + (subj.totalMarks || 0), 0)
+      const grandTotal = addSubjects.reduce((sum, subj) => sum + (subj.marks.T || 0), 0)
       const maxTotal = addSubjects.reduce((sum, subj) => {
         // Try to get max marks from subject object if available, fallback to 100
         // You may want to adjust this if you have maxWritten and maxCE in subj.subject
@@ -453,9 +461,9 @@ export default function ResultsPage() {
                       <Label className="w-24 min-w-max">Written</Label>
                       <Input
                         type="number"
-                        value={subj.writtenMarks}
+                        value={subj.marks.W}
                         min={0}
-                        onChange={e => handleSubjectMarkChange(idx, "writtenMarks", Number(e.target.value))}
+                        onChange={e => handleSubjectMarkChange(idx, "W", Number(e.target.value))}
                         className="w-full sm:w-24"
                         required
                         inputMode="numeric"
@@ -465,9 +473,9 @@ export default function ResultsPage() {
                       <Label className="w-24 min-w-max">CE</Label>
                       <Input
                         type="number"
-                        value={subj.ceMarks}
+                        value={subj.marks.CE}
                         min={0}
-                        onChange={e => handleSubjectMarkChange(idx, "ceMarks", Number(e.target.value))}
+                        onChange={e => handleSubjectMarkChange(idx, "CE", Number(e.target.value))}
                         className="w-full sm:w-24"
                         required
                         inputMode="numeric"
@@ -475,7 +483,7 @@ export default function ResultsPage() {
                     </div>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <Label className="w-24 min-w-max">Total</Label>
-                      <Input type="number" value={subj.totalMarks} readOnly className="w-full sm:w-24 bg-gray-100" />
+                      <Input type="number" value={subj.marks.T} readOnly className="w-full sm:w-24 bg-gray-100" />
                     </div>
                   </div>
                 ))}
@@ -536,9 +544,9 @@ export default function ResultsPage() {
                       <Label className="w-24 min-w-max">Written</Label>
                       <Input
                         type="number"
-                        value={subj.writtenMarks}
+                        value={subj.marks.W}
                         min={0}
-                        onChange={e => handleAddSubjectMarkChange(idx, "writtenMarks", Number(e.target.value))}
+                        onChange={e => handleAddSubjectMarkChange(idx, "W", Number(e.target.value))}
                         className="w-full sm:w-24"
                         required
                         inputMode="numeric"
@@ -548,9 +556,9 @@ export default function ResultsPage() {
                       <Label className="w-24 min-w-max">CE</Label>
                       <Input
                         type="number"
-                        value={subj.ceMarks}
+                        value={subj.marks.CE}
                         min={0}
-                        onChange={e => handleAddSubjectMarkChange(idx, "ceMarks", Number(e.target.value))}
+                        onChange={e => handleAddSubjectMarkChange(idx, "CE", Number(e.target.value))}
                         className="w-full sm:w-24"
                         required
                         inputMode="numeric"
@@ -558,7 +566,7 @@ export default function ResultsPage() {
                     </div>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <Label className="w-24 min-w-max">Total</Label>
-                      <Input type="number" value={subj.totalMarks} readOnly className="w-full sm:w-24 bg-gray-100" />
+                      <Input type="number" value={subj.marks.T} readOnly className="w-full sm:w-24 bg-gray-100" />
                     </div>
                   </div>
                 ))}

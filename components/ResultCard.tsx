@@ -1,13 +1,25 @@
 "use client"
 
+interface ScoringComponent {
+  key: string
+  label: string
+  max?: number
+  computed?: boolean
+}
+
 interface Subject {
   name: string
   nameArabic: string
-  writtenMarks: number
-  ceMarks: number
-  totalMarks: number
-  maxWritten: number
-  maxCE: number
+  scoringScheme: ScoringComponent[]
+}
+
+interface SubjectMark {
+  subject: {
+    name: string
+    nameArabic: string
+    scoringScheme: ScoringComponent[]
+  }
+  marks: Record<string, number> // e.g., { W: 80, CE: 10, T: 90 }
 }
 
 interface ResultCardProps {
@@ -18,7 +30,7 @@ interface ResultCardProps {
     name: string
     profilePhoto?: string // add profilePhoto to student prop
   }
-  subjects: Subject[]
+  subjects: SubjectMark[]
   grandTotal: number
   maxTotal: number
   rank: number
@@ -122,8 +134,9 @@ export default function ResultCard({
         </h2>
 
         <div className="space-y-4 mb-8">
-          {subjects.map((subject, index) => {
-            const subjectPercentage = (subject.totalMarks / (subject.maxWritten + subject.maxCE)) * 100
+          {subjects.map((subjectMark, index) => {
+            const { subject, marks } = subjectMark
+            const subjectPercentage = (marks.T / (subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0) || 1)) * 100
             return (
               <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
@@ -141,30 +154,16 @@ export default function ResultCard({
                   {/* Marks Breakdown */}
                   <div className="md:col-span-6">
                     <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase">Written</label>
-                        <div
-                          className={`text-lg font-bold px-2 py-1 rounded ${getScoreColor(subject.writtenMarks, subject.maxWritten)}`}
-                        >
-                          {subject.writtenMarks}/{subject.maxWritten}
+                      {subject.scoringScheme.map((component, idx) => (
+                        <div key={idx}>
+                          <label className="text-xs font-medium text-gray-500 uppercase">{component.label}</label>
+                          <div
+                            className={`text-lg font-bold px-2 py-1 rounded ${getScoreColor(marks[component.key], component.max || 0)}`}
+                          >
+                            {marks[component.key]}/{component.max}
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase">CE</label>
-                        <div
-                          className={`text-lg font-bold px-2 py-1 rounded ${getScoreColor(subject.ceMarks, subject.maxCE)}`}
-                        >
-                          {subject.ceMarks}/{subject.maxCE}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase">Total</label>
-                        <div
-                          className={`text-xl font-bold px-2 py-1 rounded ${getScoreColor(subject.totalMarks, subject.maxWritten + subject.maxCE)}`}
-                        >
-                          {subject.totalMarks}/{subject.maxWritten + subject.maxCE}
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
 
