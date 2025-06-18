@@ -2,10 +2,18 @@ import { type NextRequest, NextResponse } from "next/server"
 import dbConnect from "@/lib/mongodb"
 import Subject from "@/models/Subject"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await dbConnect()
-    const subjects = await Subject.find().sort({ createdAt: -1 })
+    const url = new URL(request.url)
+    const idsParam = url.searchParams.get("ids")
+    let subjects
+    if (idsParam) {
+      const ids = idsParam.split(",")
+      subjects = await Subject.find({ _id: { $in: ids } }).sort({ createdAt: -1 })
+    } else {
+      subjects = await Subject.find().sort({ createdAt: -1 })
+    }
     return NextResponse.json(subjects)
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch subjects" }, { status: 500 })

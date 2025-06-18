@@ -9,7 +9,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (!batch) {
       return NextResponse.json({ error: "Batch not found" }, { status: 404 })
     }
-    return NextResponse.json(batch)
+    // Return only subject IDs, not full subject objects
+    const batchData = batch.toObject()
+    batchData.subjects = (batch.subjects || []).map((s: any) => s._id?.toString?.() || s.toString?.() || s)
+    return NextResponse.json(batchData)
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch batch" }, { status: 500 })
   }

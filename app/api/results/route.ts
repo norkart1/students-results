@@ -27,13 +27,34 @@ export async function POST(request: NextRequest) {
     await dbConnect()
     const body = await request.json()
 
-    // Calculate grand total and percentage
-    const grandTotal = body.subjects.reduce((sum: number, subject: any) => sum + subject.totalMarks, 0)
-    const maxPossibleMarks = body.subjects.length * 100
-    const percentage = (grandTotal / maxPossibleMarks) * 100
+    // Calculate grand total and percentage using new flexible marks structure
+    let grandTotal = 0
+    let maxPossibleMarks = 0
+    const subjects = (body.subjects || []).map((subjectMark: any) => {
+      // Find the computed total key (usually 'T')
+      const scoringScheme = subjectMark.subject?.scoringScheme || []
+      const totalComp = scoringScheme.find((c: any) => c.computed && (c.key?.toLowerCase() === 't' || c.label?.toLowerCase() === 'total'))
+      let total = 0
+      let max = 0
+      if (totalComp && totalComp.key) {
+        // Sum all non-computed fields for total
+        total = scoringScheme.filter((c: any) => !c.computed).reduce((acc: number, c: any) => acc + (Number(subjectMark.marks[c.key]) || 0), 0)
+        max = scoringScheme.filter((c: any) => !c.computed).reduce((acc: number, c: any) => acc + (Number(c.max) || 0), 0)
+        subjectMark.marks[totalComp.key] = total
+      } else {
+        // Fallback: sum all fields
+        total = Object.values(subjectMark.marks).reduce((acc: number, v: any) => acc + (Number(v) || 0), 0)
+        max = 100
+      }
+      grandTotal += total
+      maxPossibleMarks += max
+      return subjectMark
+    })
+    const percentage = maxPossibleMarks > 0 ? (grandTotal / maxPossibleMarks) * 100 : 0
 
     const result = await Result.create({
       ...body,
+      subjects,
       grandTotal,
       percentage: Math.round(percentage * 10) / 10,
     })

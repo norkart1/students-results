@@ -89,15 +89,21 @@ export default function ResultsPage() {
   // Fetch subjects for selected batch
   useEffect(() => {
     if (addBatchId) {
-      fetch(`/api/subjects?batch=${addBatchId}`)
+      fetch(`/api/batches/${addBatchId}`)
         .then(res => res.json())
-        .then(subjects => {
-          setAddSubjects(subjects.map((s: any) => ({
-            subject: s,
-            marks: Object.fromEntries(
-              (s.scoringScheme || []).map((comp: any) => [comp.key, 0])
-            )
-          })))
+        .then(batch => {
+          // batch.subjects is an array of subject IDs
+          // Fetch subject details for these IDs
+          fetch(`/api/subjects?ids=${batch.subjects.join(",")}`)
+            .then(res => res.json())
+            .then(subjects => {
+              setAddSubjects(subjects.map((s: any) => ({
+                subject: s,
+                marks: Object.fromEntries(
+                  (s.scoringScheme || []).map((comp: any) => [comp.key, 0])
+                )
+              })))
+            })
         })
     } else {
       setAddSubjects([])
