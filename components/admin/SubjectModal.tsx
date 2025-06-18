@@ -76,22 +76,39 @@ export default function SubjectModal({ isOpen, onClose, subject, onSave }: Subje
     }
   }, [isOpen, subject])
 
+  // Ensure 'Total' is always the last component in the scoring scheme
+  useEffect(() => {
+    // Only run if scoringScheme has a 'Total' component
+    const totalIdx = scoringScheme.findIndex(c => c.key.toLowerCase() === 't' || c.label.toLowerCase() === 'total')
+    if (totalIdx !== -1 && totalIdx !== scoringScheme.length - 1) {
+      // Move 'Total' to the end
+      const updated = [...scoringScheme]
+      const [totalComp] = updated.splice(totalIdx, 1)
+      updated.push(totalComp)
+      setScoringScheme(updated)
+    }
+  }, [scoringScheme])
+
+  // When saving, if 'Total' is present and not computed, set computed=true
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
+    // Always ensure 'Total' is at the end and marked as computed
+    let updatedScheme = [...scoringScheme]
+    const totalIdx = updatedScheme.findIndex(c => c.key.toLowerCase() === 't' || c.label.toLowerCase() === 'total')
+    if (totalIdx !== -1) {
+      updatedScheme = updatedScheme.filter((_, i) => i !== totalIdx)
+      updatedScheme.push({ ...scoringScheme[totalIdx], computed: true })
+    }
     setLoading(true)
-
     try {
       const url = subject ? `/api/subjects/${subject._id}` : "/api/subjects"
       const method = subject ? "PUT" : "POST"
-
-      const payload = { ...formData, scoringScheme }
-
+      const payload = { ...formData, scoringScheme: updatedScheme }
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-
       if (response.ok) {
         onSave()
         onClose()
