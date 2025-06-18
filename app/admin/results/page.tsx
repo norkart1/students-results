@@ -9,6 +9,7 @@ import { Plus, Search, Eye, Edit, Trash2, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import Papa from "papaparse"
 
 interface Result {
   _id: string
@@ -34,10 +35,10 @@ interface Batch {
 }
 
 interface ScoringComponent {
-  // Define the structure of your scoring component here
-  // For example:
-  type: string; // 'W' | 'CE' | 'T' | etc.
-  maxMarks: number;
+  key: string;
+  label: string;
+  max?: number;
+  computed?: boolean;
 }
 
 interface SubjectMark {
@@ -70,6 +71,10 @@ export default function ResultsPage() {
   const [addLoading, setAddLoading] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   const [students, setStudents] = useState<any[]>([])
+  const [csvUploadModalOpen, setCsvUploadModalOpen] = useState(false)
+  const [csvPreview, setCsvPreview] = useState<any[]>([])
+  const [csvError, setCsvError] = useState<string|null>(null)
+  const [csvSubjects, setCsvSubjects] = useState<any[]>([])
 
   useEffect(() => {
     fetchData()
@@ -244,9 +249,8 @@ export default function ResultsPage() {
       const grandTotal = editSubjects.reduce((sum, subj) => sum + (subj.marks.T || 0), 0)
       // Calculate max possible marks
       const maxTotal = editSubjects.reduce((sum, subj) => {
-        // Try to get max marks from subject object if available, fallback to 100
-        // You may want to adjust this if you have maxMarks in subj.subject
-        return sum + (subj.subject.maxMarks || 100)
+        // Sum all non-computed max values from scoringScheme
+        return sum + (subj.subject.scoringScheme || []).filter((c: any) => !c.computed).reduce((acc: number, c: any) => acc + (c.max || 0), 0)
       }, 0)
       const percentage = maxTotal > 0 ? parseFloat(((grandTotal / maxTotal) * 100).toFixed(2)) : 0
 
@@ -321,6 +325,121 @@ export default function ResultsPage() {
       setAddError("Failed to add result. Please try again.")
     } finally {
       setAddLoading(false)
+    }
+  }
+
+  // Download CSV template for selected batch
+  const handleDownloadTemplate = async () => {
+    if (!selectedBatch || selectedBatch === "all") return
+    // Fetch batch and subjects
+    const batchRes = await fetch(`/api/batches/${selectedBatch}`)
+    const batch = await batchRes.json()
+    const subjectsRes = await fetch(`/api/subjects?ids=${batch.subjects.join(",")}`)
+    const subjects = await subjectsRes.json()
+    setCsvSubjects(subjects)
+    // Build columns: regNumber, [subject code + scoring key ...]
+    let columns = ["regNumber"]
+    subjects.forEach((subj: any) => {
+      (subj.scoringScheme || []).forEach((comp: any) => {
+        if (!comp.computed) {
+          columns.push(`${subj.code}_${comp.key}`)
+        }
+      })
+    })
+    // Dummy row
+    let dummy = { regNumber: "STU001" }
+    subjects.forEach((subj: any) => {
+      (subj.scoringScheme || []).forEach((comp: any) => {
+        if (!comp.computed) {
+          dummy[`${subj.code}_${comp.key}`] = ""
+        }
+      })
+    })
+    const csv = Papa.unparse([columns, Object.values(dummy)])
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `results-template-${batch.name}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  // Handle CSV upload
+  const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCsvError(null)
+    const file = e.target.files?.[0]
+    if (!file) return
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        // Validate columns
+        if (!selectedBatch || selectedBatch === "all") {
+          setCsvError("Please select a batch first.")
+          return
+        }
+        // Fetch batch and subjects for validation
+        const batchRes = await fetch(`/api/batches/${selectedBatch}`)
+        const batch = await batchRes.json()
+        const subjectsRes = await fetch(`/api/subjects?ids=${batch.subjects.join(",")}`)
+        const subjects = await subjectsRes.json()
+        setCsvSubjects(subjects)
+        // Build expected columns
+        let expected = ["regNumber"]
+        subjects.forEach((subj: any) => {
+          (subj.scoringScheme || []).forEach((comp: any) => {
+            if (!comp.computed) expected.push(`${subj.code}_${comp.key}`)
+          })
+        })
+        const actual = results.meta.fields || []
+        for (let col of expected) {
+          if (!actual.includes(col)) {
+            setCsvError(`Missing column: ${col}`)
+            return
+          }
+        }
+        setCsvPreview(results.data)
+        setCsvUploadModalOpen(true)
+      },
+      error: (err) => setCsvError("Failed to parse CSV: " + err.message)
+    })
+  }
+
+  // Submit bulk upload
+  const handleBulkUpload = async () => {
+    setCsvError(null)
+    try {
+      // Transform preview data to API format
+      const data = csvPreview.map((row) => {
+        // Find student by regNumber (assume already exists)
+        return {
+          regNumber: row.regNumber,
+          subjects: csvSubjects.map((subj: any) => {
+            let marks: Record<string, number> = {}
+            subj.scoringScheme.forEach((comp: any) => {
+              if (!comp.computed) {
+                marks[comp.key] = Number(row[`${subj.code}_${comp.key}`] || 0)
+              }
+            })
+            return { subject: subj._id, marks }
+          })
+        }
+      })
+      // POST to backend
+      const res = await fetch("/api/results/bulk-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ batch: selectedBatch, results: data })
+      })
+      if (!res.ok) throw new Error("Bulk upload failed")
+      setCsvUploadModalOpen(false)
+      setCsvPreview([])
+      fetchData()
+    } catch (err: any) {
+      setCsvError(err.message || "Bulk upload failed")
     }
   }
 
@@ -589,6 +708,85 @@ export default function ResultsPage() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <div className="flex items-center gap-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={selectedBatch === "all"}
+          onClick={handleDownloadTemplate}
+        >
+          Download CSV Template
+        </Button>
+        <label className="inline-block">
+          <span className="sr-only">Upload CSV</span>
+          <Input
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={handleCsvUpload}
+            disabled={selectedBatch === "all"}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            disabled={selectedBatch === "all"}
+          >
+            <span>Bulk Upload Results</span>
+          </Button>
+        </label>
+      </div>
+      {/* CSV Upload Modal */}
+      <Dialog open={csvUploadModalOpen} onOpenChange={setCsvUploadModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Bulk Upload Preview</DialogTitle>
+          </DialogHeader>
+          {csvError && <div className="text-red-500 mb-2">{csvError}</div>}
+          <div className="overflow-x-auto max-h-96 mb-4">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr>
+                  {csvSubjects.length > 0 && (
+                    <>
+                      <th className="px-2 py-1">Reg Number</th>
+                      {csvSubjects.map((subj: any) =>
+                        subj.scoringScheme.filter((c: any) => !c.computed).map((c: any) => (
+                          <th key={`${subj.code}_${c.key}`} className="px-2 py-1">{subj.code} {c.label}</th>
+                        ))
+                      )}
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {csvPreview.map((row, i) => (
+                  <tr key={i}>
+                    <td className="border px-2 py-1">{row.regNumber}</td>
+                    {csvSubjects.map((subj: any) =>
+                      subj.scoringScheme.filter((c: any) => !c.computed).map((c: any) => (
+                        <td key={`${subj.code}_${c.key}`} className="border px-2 py-1">{row[`${subj.code}_${c.key}`]}</td>
+                      ))
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setCsvUploadModalOpen(false)} className="flex-1">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleBulkUpload}
+              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600"
+            >
+              Upload Results
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
