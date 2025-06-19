@@ -115,7 +115,9 @@ export default function ResultCard({
                 src={student.profilePhoto || "/images/student-avatar.png"}
                 alt="Profile Photo"
                 className="w-20 h-20 object-cover rounded-full border"
-                onError={(e) => (e.currentTarget.src = "/images/student-avatar.png")}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/images/student-avatar.png";
+                }}
               />
             </div>
             <div className="space-y-3">
@@ -202,7 +204,7 @@ export default function ResultCard({
                             </div>
                           );
                         })
-                      }
+                      )}
                     </div>
                   </div>
 
