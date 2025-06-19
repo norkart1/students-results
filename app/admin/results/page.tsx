@@ -434,8 +434,22 @@ export default function ResultsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ batch: selectedBatch, results: data })
       })
-      if (!res.ok) throw new Error("Bulk upload failed")
-      const result = await res.json()
+      let result
+      try {
+        result = await res.json()
+      } catch {
+        throw new Error("Bulk upload failed (invalid response)")
+      }
+      if (!res.ok) {
+        if (result && result.errors && Array.isArray(result.errors) && result.errors.length > 0) {
+          setCsvError(result.errors)
+        } else if (result && result.error) {
+          setCsvError(result.error)
+        } else {
+          setCsvError("Bulk upload failed")
+        }
+        return
+      }
       if (result.errors && result.errors.length > 0) {
         setCsvError(result.errors)
         return
@@ -750,7 +764,21 @@ export default function ResultsPage() {
           <DialogHeader>
             <DialogTitle>Bulk Upload Preview</DialogTitle>
           </DialogHeader>
-          {csvError && <div className="text-red-500 mb-2">{csvError}</div>}
+          {/* Improved error display for failed rows */}
+          {Array.isArray(csvError) && csvError.length > 0 ? (
+            <div className="mb-4">
+              <div className="text-red-600 font-semibold mb-2">Some rows failed to upload:</div>
+              <ul className="list-disc pl-6 text-sm text-red-500 max-h-40 overflow-y-auto">
+                {csvError.map((err: any, idx: number) => (
+                  <li key={idx}>
+                    Reg Number <span className="font-mono">{err.regNumber}</span>: {err.error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : csvError && (
+            <div className="text-red-500 mb-2">{csvError}</div>
+          )}
           <div className="overflow-x-auto max-h-96 mb-4">
             <table className="min-w-full text-xs">
               <thead>
@@ -781,19 +809,6 @@ export default function ResultsPage() {
               </tbody>
             </table>
           </div>
-          {/* Improved error display for failed rows */}
-          {Array.isArray(csvError) && csvError.length > 0 && (
-            <div className="mb-4">
-              <div className="text-red-600 font-semibold mb-2">Some rows failed to upload:</div>
-              <ul className="list-disc pl-6 text-sm text-red-500 max-h-40 overflow-y-auto">
-                {csvError.map((err: any, idx: number) => (
-                  <li key={idx}>
-                    Reg Number <span className="font-mono">{err.regNumber}</span>: {err.error}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCsvUploadModalOpen(false)} className="flex-1">
               Cancel
