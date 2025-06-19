@@ -636,7 +636,7 @@ export default function ResultsPage() {
                       <input
                         type="checkbox"
                         id={`edit-absent-${idx}`}
-                        checked={!!editAbsent[idx] || (editSubjects[idx].marks && 'absent' in editSubjects[idx].marks && editSubjects[idx].marks.absent)}
+                        checked={Boolean(editAbsent[idx]) || Boolean(editSubjects[idx].marks && typeof editSubjects[idx].marks === 'object' && 'absent' in editSubjects[idx].marks && editSubjects[idx].marks.absent)}
                         onChange={e => {
                           setEditAbsent(prev => ({ ...prev, [idx]: e.target.checked }));
                           setEditSubjects(prev => prev.map((s, i) =>
