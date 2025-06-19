@@ -435,6 +435,11 @@ export default function ResultsPage() {
         body: JSON.stringify({ batch: selectedBatch, results: data })
       })
       if (!res.ok) throw new Error("Bulk upload failed")
+      const result = await res.json()
+      if (result.errors && result.errors.length > 0) {
+        setCsvError(result.errors)
+        return
+      }
       setCsvUploadModalOpen(false)
       setCsvPreview([])
       fetchData()
@@ -776,6 +781,19 @@ export default function ResultsPage() {
               </tbody>
             </table>
           </div>
+          {/* Improved error display for failed rows */}
+          {Array.isArray(csvError) && csvError.length > 0 && (
+            <div className="mb-4">
+              <div className="text-red-600 font-semibold mb-2">Some rows failed to upload:</div>
+              <ul className="list-disc pl-6 text-sm text-red-500 max-h-40 overflow-y-auto">
+                {csvError.map((err: any, idx: number) => (
+                  <li key={idx}>
+                    Reg Number <span className="font-mono">{err.regNumber}</span>: {err.error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCsvUploadModalOpen(false)} className="flex-1">
               Cancel
