@@ -1,4 +1,6 @@
-"use client"
+"use client";
+
+import React from 'react';
 
 interface ScoringComponent {
   key: string
@@ -182,7 +184,7 @@ export default function ResultCard({
                             </div>
                           );
                         })
-                      }
+                      )}
                     </div>
                   </div>
 
