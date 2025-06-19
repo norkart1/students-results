@@ -19,7 +19,7 @@ interface SubjectMark {
     nameArabic: string
     scoringScheme: ScoringComponent[]
   }
-  marks: Record<string, number> // e.g., { W: 80, CE: 10, T: 90 }
+  marks: Record<string, number> | { absent: true } // allow absent
 }
 
 interface ResultCardProps {
@@ -136,7 +136,10 @@ export default function ResultCard({
         <div className="space-y-4 mb-8">
           {subjects.map((subjectMark, index) => {
             const { subject, marks } = subjectMark
-            const subjectPercentage = (marks.T / (subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0) || 1)) * 100
+            const isAbsent = 'absent' in marks && marks.absent
+            const totalMax = subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0)
+            const totalObtained = !isAbsent ? subject.scoringScheme.reduce((acc, curr) => acc + ((marks as Record<string, number>)[curr.key] || 0), 0) : 0
+            const subjectPercentage = isAbsent ? 0 : (totalObtained / (totalMax || 1)) * 100
             return (
               <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
@@ -154,35 +157,41 @@ export default function ResultCard({
                   {/* Marks Breakdown */}
                   <div className="md:col-span-6">
                     <div className="grid grid-cols-3 gap-4 text-center">
-                      {subject.scoringScheme.map((component, idx) => (
-                        <div key={idx}>
-                          <label className="text-xs font-medium text-gray-500 uppercase">{component.label}</label>
-                          <div
-                            className={`text-lg font-bold px-2 py-1 rounded ${getScoreColor(marks[component.key], component.max || 0)}`}
-                          >
-                            {marks[component.key]}/{component.max}
+                      {isAbsent ? (
+                        <div className="col-span-3 text-red-600 font-bold text-lg">Absent</div>
+                      ) : (
+                        subject.scoringScheme.map((component, idx) => (
+                          <div key={idx}>
+                            <label className="text-xs font-medium text-gray-500 uppercase">{component.label}</label>
+                            <div
+                              className={`text-lg font-bold px-2 py-1 rounded ${getScoreColor((marks as Record<string, number>)[component.key], component.max || 0)}`}
+                            >
+                              {(marks as Record<string, number>)[component.key]}/{component.max}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   </div>
 
                   {/* Performance Bar */}
                   <div className="md:col-span-2">
                     <div className="text-center">
-                      <div className="text-sm font-medium text-gray-600 mb-1">{subjectPercentage.toFixed(1)}%</div>
+                      <div className="text-sm font-medium text-gray-600 mb-1">{isAbsent ? '--' : subjectPercentage.toFixed(1) + '%'}</div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div
                           className={`h-3 rounded-full transition-all duration-300 ${
-                            subjectPercentage >= 80
-                              ? "bg-green-500"
-                              : subjectPercentage >= 60
-                                ? "bg-blue-500"
-                                : subjectPercentage >= 40
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
+                            isAbsent
+                              ? 'bg-gray-400'
+                              : subjectPercentage >= 80
+                                ? "bg-green-500"
+                                : subjectPercentage >= 60
+                                  ? "bg-blue-500"
+                                  : subjectPercentage >= 40
+                                    ? "bg-yellow-500"
+                                    : "bg-red-500"
                           }`}
-                          style={{ width: `${Math.min(subjectPercentage, 100)}%` }}
+                          style={{ width: isAbsent ? '100%' : `${Math.min(subjectPercentage, 100)}%` }}
                         ></div>
                       </div>
                     </div>

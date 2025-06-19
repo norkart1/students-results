@@ -75,6 +75,8 @@ export default function ResultsPage() {
   const [csvPreview, setCsvPreview] = useState<any[]>([])
   const [csvError, setCsvError] = useState<string|null>(null)
   const [csvSubjects, setCsvSubjects] = useState<any[]>([])
+  const [addAbsent, setAddAbsent] = useState<{ [idx: number]: boolean }>({})
+  const [editAbsent, setEditAbsent] = useState<{ [idx: number]: boolean }>({})
 
   useEffect(() => {
     fetchData()
@@ -628,18 +630,37 @@ export default function ResultsPage() {
                     <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>
                       {subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span>
                     </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        id={`edit-absent-${idx}`}
+                        checked={!!editAbsent[idx] || (editSubjects[idx].marks && 'absent' in editSubjects[idx].marks && editSubjects[idx].marks.absent)}
+                        onChange={e => {
+                          setEditAbsent(prev => ({ ...prev, [idx]: e.target.checked }));
+                          setEditSubjects(prev => prev.map((s, i) =>
+                            i === idx
+                              ? { ...s, marks: e.target.checked ? { absent: true } : Object.fromEntries((s.subject.scoringScheme || []).map((comp) => [comp.key, 0])) }
+                              : s
+                          ));
+                        }}
+                        className="mr-2"
+                      />
+                      <label htmlFor={`edit-absent-${idx}`} className="text-sm text-red-600 font-semibold">Absent</label>
+                    </div>
                     {(subj.subject.scoringScheme || []).map((comp: any) => (
                       <div key={comp.key} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <Label className="w-24 min-w-max">{comp.label}</Label>
                         <Input
                           type="number"
-                          value={subj.marks?.[comp.key] ?? ''}
+                          value={typeof subj.marks[comp.key] === 'number' ? subj.marks[comp.key] : 0}
                           min={0}
                           onChange={e => handleSubjectMarkChange(idx, comp.key, Number(e.target.value))}
                           className="w-full sm:w-24"
-                          required={!comp.computed}
+                          required={!comp.computed && !(editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent))}
                           inputMode="numeric"
-                          readOnly={!!comp.computed}
+                          readOnly={!!comp.computed || !!editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent)}
+                          style={comp.computed || editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent) ? { background: '#f3f4f6' } : {}}
+                          disabled={!!editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent)}
                         />
                       </div>
                     ))}
@@ -700,19 +721,37 @@ export default function ResultsPage() {
                     <div className="font-semibold mb-1 text-base truncate" title={subj.subject.name}>
                       {subj.subject.name} <span className="text-xs text-gray-400">({subj.subject.code})</span>
                     </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        id={`absent-${idx}`}
+                        checked={!!addAbsent[idx]}
+                        onChange={e => {
+                          setAddAbsent(prev => ({ ...prev, [idx]: e.target.checked }));
+                          setAddSubjects(prev => prev.map((s, i) =>
+                            i === idx
+                              ? { ...s, marks: e.target.checked ? { absent: true } : Object.fromEntries((s.subject.scoringScheme || []).map((comp) => [comp.key, 0])) }
+                              : s
+                          ));
+                        }}
+                        className="mr-2"
+                      />
+                      <label htmlFor={`absent-${idx}`} className="text-sm text-red-600 font-semibold">Absent</label>
+                    </div>
                     {(subj.subject.scoringScheme || []).map((comp: any) => (
                       <div key={comp.key} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <Label className="w-24 min-w-max">{comp.label}</Label>
                         <Input
                           type="number"
-                          value={subj.marks[comp.key] ?? 0}
+                          value={typeof subj.marks[comp.key] === 'number' ? subj.marks[comp.key] : 0}
                           min={0}
                           onChange={e => handleAddSubjectMarkChange(idx, comp.key, Number(e.target.value))}
                           className="w-full sm:w-24"
-                          required={!comp.computed}
+                          required={!comp.computed && !addAbsent[idx]}
                           inputMode="numeric"
-                          readOnly={!!comp.computed}
-                          style={comp.computed ? { background: '#f3f4f6' } : {}}
+                          readOnly={!!comp.computed || !!addAbsent[idx]}
+                          style={comp.computed || addAbsent[idx] ? { background: '#f3f4f6' } : {}}
+                          disabled={!!addAbsent[idx]}
                         />
                       </div>
                     ))}
