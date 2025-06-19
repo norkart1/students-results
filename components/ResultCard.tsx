@@ -163,23 +163,26 @@ export default function ResultCard({
                       {isAbsent ? (
                         <div className="col-span-3 text-red-600 font-bold text-lg">Absent</div>
                       ) : (
-                        subject.scoringScheme.map((component, idx) => (
-                          <div key={idx}>
-                            <label className="text-xs font-medium text-gray-500 uppercase">{component.label}</label>
-                            <div
-                              className={`text-lg font-bold px-2 py-1 rounded ${
-                                (typeof (marks as any)[component.key] === 'string' && (marks as any)[component.key] === 'A')
-                                  ? 'text-red-600 bg-red-50'
-                                  : getScoreColor((marks as Record<string, number>)[component.key], component.max || 0)
-                              }`}
-                            >
-                              {(typeof (marks as any)[component.key] === 'string' && (marks as any)[component.key] === 'A')
-                                ? 'A'
-                                : `${(marks as Record<string, number>)[component.key]}/${component.max}`}
+                        subject.scoringScheme.map((component, idx) => {
+                          const markVal = (marks as any)[component.key];
+                          const maxVal = component.max ?? '-';
+                          const isComponentAbsent = typeof markVal === 'string' && markVal === 'A';
+                          return (
+                            <div key={idx}>
+                              <label className="text-xs font-medium text-gray-500 uppercase">{component.label}</label>
+                              <div
+                                className={`text-lg font-bold px-2 py-1 rounded ${
+                                  isComponentAbsent
+                                    ? 'text-red-600 bg-red-50'
+                                    : getScoreColor(typeof markVal === 'number' ? markVal : 0, typeof component.max === 'number' ? component.max : 0)
+                                }`}
+                              >
+                                {isComponentAbsent ? 'A' : `${typeof markVal === 'number' ? markVal : 0}/${maxVal}`}
+                              </div>
                             </div>
-                          </div>
-                        ))
-                      )}
+                          );
+                        })
+                      }
                     </div>
                   </div>
 
