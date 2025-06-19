@@ -138,7 +138,10 @@ export default function ResultCard({
             const { subject, marks } = subjectMark
             const isAbsent = 'absent' in marks && marks.absent
             const totalMax = subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0)
-            const totalObtained = !isAbsent ? subject.scoringScheme.reduce((acc, curr) => acc + ((marks as Record<string, number>)[curr.key] || 0), 0) : 0
+            const totalObtained = !isAbsent ? subject.scoringScheme.reduce((acc, curr) => {
+              const val = (marks as any)[curr.key];
+              return acc + (typeof val === 'number' ? val : 0);
+            }, 0) : 0
             const subjectPercentage = isAbsent ? 0 : (totalObtained / (totalMax || 1)) * 100
             return (
               <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -164,9 +167,15 @@ export default function ResultCard({
                           <div key={idx}>
                             <label className="text-xs font-medium text-gray-500 uppercase">{component.label}</label>
                             <div
-                              className={`text-lg font-bold px-2 py-1 rounded ${getScoreColor((marks as Record<string, number>)[component.key], component.max || 0)}`}
+                              className={`text-lg font-bold px-2 py-1 rounded ${
+                                (typeof (marks as any)[component.key] === 'string' && (marks as any)[component.key] === 'A')
+                                  ? 'text-red-600 bg-red-50'
+                                  : getScoreColor((marks as Record<string, number>)[component.key], component.max || 0)
+                              }`}
                             >
-                              {(marks as Record<string, number>)[component.key]}/{component.max}
+                              {(typeof (marks as any)[component.key] === 'string' && (marks as any)[component.key] === 'A')
+                                ? 'A'
+                                : `${(marks as Record<string, number>)[component.key]}/${component.max}`}
                             </div>
                           </div>
                         ))

@@ -77,6 +77,8 @@ export default function ResultsPage() {
   const [csvSubjects, setCsvSubjects] = useState<any[]>([])
   const [addAbsent, setAddAbsent] = useState<{ [idx: number]: boolean }>({})
   const [editAbsent, setEditAbsent] = useState<{ [idx: number]: boolean }>({})
+  const [addComponentAbsent, setAddComponentAbsent] = useState<{ [idx: number]: { [key: string]: boolean } }>({})
+  const [editComponentAbsent, setEditComponentAbsent] = useState<{ [idx: number]: { [key: string]: boolean } }>({})
 
   useEffect(() => {
     fetchData()
@@ -668,6 +670,23 @@ export default function ResultsPage() {
                           style={comp.computed || editAbsent[idx] || (subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent) ? { background: '#f3f4f6' } : {}}
                           disabled={!!editAbsent[idx] || (subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent)}
                         />
+                        <input
+                          type="checkbox"
+                          checked={!!editComponentAbsent[idx]?.[comp.key]}
+                          onChange={e => {
+                            setEditComponentAbsent(prev => ({
+                              ...prev,
+                              [idx]: { ...prev[idx], [comp.key]: e.target.checked }
+                            }));
+                            setEditSubjects(prev => prev.map((s, i) =>
+                              i === idx
+                                ? { ...s, marks: { ...s.marks, [comp.key]: e.target.checked ? 'A' : 0 } }
+                                : s
+                            ));
+                          }}
+                          className="ml-2"
+                        />
+                        <label className="text-xs text-red-600">Absent</label>
                       </div>
                     ))}
                   </div>
@@ -749,16 +768,39 @@ export default function ResultsPage() {
                         <Label className="w-24 min-w-max">{comp.label}</Label>
                         <Input
                           type="number"
-                          value={typeof subj.marks[comp.key] === 'number' ? subj.marks[comp.key] : 0}
+                          value={
+                            subj.marks && typeof subj.marks === 'object' && subj.marks[comp.key] === 'A'
+                              ? ''
+                              : typeof subj.marks[comp.key] === 'number'
+                                ? subj.marks[comp.key]
+                                : 0
+                          }
                           min={0}
                           onChange={e => handleAddSubjectMarkChange(idx, comp.key, Number(e.target.value))}
                           className="w-full sm:w-24"
-                          required={!comp.computed && !addAbsent[idx]}
+                          required={!comp.computed && !addAbsent[idx] && !addComponentAbsent[idx]?.[comp.key]}
                           inputMode="numeric"
-                          readOnly={!!comp.computed || !!addAbsent[idx]}
-                          style={comp.computed || addAbsent[idx] ? { background: '#f3f4f6' } : {}}
-                          disabled={!!addAbsent[idx]}
+                          readOnly={!!comp.computed || !!addAbsent[idx] || !!addComponentAbsent[idx]?.[comp.key]}
+                          style={comp.computed || addAbsent[idx] || !!addComponentAbsent[idx]?.[comp.key] ? { background: '#f3f4f6' } : {}}
+                          disabled={!!addAbsent[idx] || !!addComponentAbsent[idx]?.[comp.key]}
                         />
+                        <input
+                          type="checkbox"
+                          checked={!!addComponentAbsent[idx]?.[comp.key]}
+                          onChange={e => {
+                            setAddComponentAbsent(prev => ({
+                              ...prev,
+                              [idx]: { ...prev[idx], [comp.key]: e.target.checked }
+                            }));
+                            setAddSubjects(prev => prev.map((s, i) =>
+                              i === idx
+                                ? { ...s, marks: { ...s.marks, [comp.key]: e.target.checked ? 'A' : 0 } }
+                                : s
+                            ));
+                          }}
+                          className="ml-2"
+                        />
+                        <label className="text-xs text-red-600">Absent</label>
                       </div>
                     ))}
                   </div>
