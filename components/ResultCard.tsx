@@ -76,6 +76,20 @@ export default function ResultCard({
 
   const gradeInfo = getGrade(percentage)
 
+  // Calculate failed subjects (less than 35% or absent)
+  const failedSubjects = subjects.reduce((count, subjectMark) => {
+    const { subject, marks } = subjectMark;
+    const isAbsent = 'absent' in marks && marks.absent;
+    const totalMax = subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0);
+    const totalObtained = !isAbsent ? subject.scoringScheme.reduce((acc, curr) => {
+      const val = (marks as any)[curr.key];
+      return acc + (typeof val === 'number' ? val : 0);
+    }, 0) : 0;
+    const subjectPercentage = isAbsent ? 0 : (totalObtained / (totalMax || 1)) * 100;
+    if (isAbsent || subjectPercentage < 35) return count + 1;
+    return count;
+  }, 0);
+
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none print:max-w-none">
       {/* Header Section */}
@@ -145,8 +159,9 @@ export default function ResultCard({
               return acc + (typeof val === 'number' ? val : 0);
             }, 0) : 0
             const subjectPercentage = isAbsent ? 0 : (totalObtained / (totalMax || 1)) * 100
+            const isFailed = isAbsent || subjectPercentage < 35;
             return (
-              <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={index} className={`border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow ${isFailed ? 'bg-red-50' : ''}`}>
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                   {/* Subject Name */}
                   <div className="md:col-span-4">
@@ -157,6 +172,9 @@ export default function ResultCard({
                     >
                       {subject.nameArabic}
                     </p>
+                    {isFailed && (
+                      <span className="inline-block mt-2 px-2 py-1 text-xs font-bold text-white bg-red-500 rounded">Failed</span>
+                    )}
                   </div>
 
                   {/* Marks Breakdown */}
@@ -184,7 +202,7 @@ export default function ResultCard({
                             </div>
                           );
                         })
-                      )}
+                      }
                     </div>
                   </div>
 
@@ -296,13 +314,17 @@ export default function ResultCard({
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-900 mb-2">Performance Analysis</h3>
             <p className="text-sm text-gray-700">
-              {percentage >= 80
-                ? "Excellent performance! Keep up the outstanding work."
-                : percentage >= 60
-                  ? "Good performance with room for improvement in some subjects."
-                  : percentage >= 40
-                    ? "Satisfactory performance. Focus on weaker subjects for better results."
-                    : "Needs significant improvement. Consider additional support and practice."}
+              {failedSubjects >= 3 ? (
+                <span className="text-red-600 font-bold">Failed in Exam (Failed in {failedSubjects} subjects)</span>
+              ) : (
+                percentage >= 80
+                  ? "Excellent performance! Keep up the outstanding work."
+                  : percentage >= 60
+                    ? "Good performance with room for improvement in some subjects."
+                    : percentage >= 40
+                      ? "Satisfactory performance. Focus on weaker subjects for better results."
+                      : "Needs significant improvement. Consider additional support and practice."
+              )}
             </p>
           </div>
 
