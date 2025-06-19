@@ -652,15 +652,21 @@ export default function ResultsPage() {
                         <Label className="w-24 min-w-max">{comp.label}</Label>
                         <Input
                           type="number"
-                          value={typeof subj.marks[comp.key] === 'number' ? subj.marks[comp.key] : 0}
+                          value={
+                            subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent
+                              ? ''
+                              : (subj.marks && typeof subj.marks === 'object' && typeof (subj.marks as Record<string, number>)[comp.key] === 'number')
+                                ? (subj.marks as Record<string, number>)[comp.key]
+                                : 0
+                          }
                           min={0}
                           onChange={e => handleSubjectMarkChange(idx, comp.key, Number(e.target.value))}
                           className="w-full sm:w-24"
-                          required={!comp.computed && !(editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent))}
+                          required={!comp.computed && !(editAbsent[idx] || (subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent))}
                           inputMode="numeric"
-                          readOnly={!!comp.computed || !!editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent)}
-                          style={comp.computed || editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent) ? { background: '#f3f4f6' } : {}}
-                          disabled={!!editAbsent[idx] || (subj.marks && 'absent' in subj.marks && subj.marks.absent)}
+                          readOnly={!!comp.computed || !!editAbsent[idx] || (subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent)}
+                          style={comp.computed || editAbsent[idx] || (subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent) ? { background: '#f3f4f6' } : {}}
+                          disabled={!!editAbsent[idx] || (subj.marks && typeof subj.marks === 'object' && 'absent' in subj.marks && subj.marks.absent)}
                         />
                       </div>
                     ))}
