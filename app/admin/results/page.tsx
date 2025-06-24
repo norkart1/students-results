@@ -154,19 +154,16 @@ export default function ResultsPage() {
       if (b.grandTotal !== a.grandTotal) return b.grandTotal - a.grandTotal;
       return a.student.regNumber.localeCompare(b.student.regNumber);
     });
-    // Assign ranks (same marks = same rank, next rank is not skipped)
+    // Assign ranks (same marks = same rank, next rank is previous rank + 1, no gaps)
     let lastTotal: number | null = null;
     let lastRank = 0;
-    let sameRankCount = 0;
     filtered.forEach((result, idx) => {
       if (result.grandTotal === lastTotal) {
         result.rank = lastRank;
-        sameRankCount++;
       } else {
         lastRank = idx + 1;
         result.rank = lastRank;
         lastTotal = result.grandTotal;
-        sameRankCount = 1;
       }
       // Recalculate percentage using batchMaxTotal if available
       if (batchMaxTotal > 0) {
