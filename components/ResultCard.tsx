@@ -88,12 +88,13 @@ export default function ResultCard({
     return count;
   }, 0);
 
-  // Calculate accurate maxTotal from unique subjects
-  const uniqueSubjects = Array.from(
-    new Map(subjects.map(s => [s.subject.name, s.subject])).values()
-  );
-  const maxTotal = uniqueSubjects.reduce((sum, subject) => {
-    return sum + subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0);
+  // Calculate accurate maxTotal from subjects: only sum non-computed, numeric max values
+  const maxTotal = subjects.reduce((sum, subjectMark) => {
+    return sum + subjectMark.subject.scoringScheme.reduce((acc, curr) => {
+      if (curr.computed) return acc;
+      if (typeof curr.max !== 'number') return acc;
+      return acc + curr.max;
+    }, 0);
   }, 0);
 
   return (
