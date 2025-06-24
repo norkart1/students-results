@@ -48,7 +48,7 @@ interface SubjectMark {
     code: string;
     scoringScheme: ScoringComponent[];
   };
-  marks: Record<string, number>; // e.g., { W: 80, CE: 10, T: 90 }
+  marks: Record<string, number>;
 }
 
 export default function ResultsPage() {
@@ -79,28 +79,23 @@ export default function ResultsPage() {
   const [editAbsent, setEditAbsent] = useState<{ [idx: number]: boolean }>({})
   const [addComponentAbsent, setAddComponentAbsent] = useState<{ [idx: number]: { [key: string]: boolean } }>({})
   const [editComponentAbsent, setEditComponentAbsent] = useState<{ [idx: number]: { [key: string]: boolean } }>({})
-  // Calculate batchMaxTotal for selected batch (used for all students in the batch)
   const [batchMaxTotal, setBatchMaxTotal] = useState<number>(0);
 
   useEffect(() => {
     fetchData()
   }, [])
 
-  // Fetch students for add modal
   useEffect(() => {
     if (addModalOpen && students.length === 0) {
       fetch("/api/students").then(res => res.json()).then(setStudents)
     }
   }, [addModalOpen])
 
-  // Fetch subjects for selected batch
   useEffect(() => {
     if (addBatchId) {
       fetch(`/api/batches/${addBatchId}`)
         .then(res => res.json())
         .then(batch => {
-          // batch.subjects is an array of subject IDs
-          // Fetch subject details for these IDs
           fetch(`/api/subjects?ids=${batch.subjects.join(",")}`)
             .then(res => res.json())
             .then(subjects => {
@@ -117,7 +112,6 @@ export default function ResultsPage() {
     }
   }, [addBatchId])
 
-  // Calculate batchMaxTotal for selected batch (used for all students in the batch)
   useEffect(() => {
     async function fetchBatchMaxTotal() {
       if (selectedBatch === "all") {
@@ -149,27 +143,40 @@ export default function ResultsPage() {
           result.student?.regNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
+    
     // Sort by grandTotal desc, then regNumber asc
     filtered.sort((a, b) => {
       if (b.grandTotal !== a.grandTotal) return b.grandTotal - a.grandTotal;
       return a.student.regNumber.localeCompare(b.student.regNumber);
     });
-    // Assign ranks (same marks = same rank, next rank is previous rank + 1, no gaps)
+    
+    // Assign ranks with no gaps after ties
+    let currentRank = 1;
     let lastTotal: number | null = null;
-    let lastRank = 0;
+    
     filtered.forEach((result, idx) => {
-      if (result.grandTotal === lastTotal) {
-        result.rank = lastRank;
-      } else {
-        lastRank = idx + 1;
-        result.rank = lastRank;
+      if (result.grandTotal !== lastTotal) {
+        // New score, assign current rank
+        result.rank = currentRank;
         lastTotal = result.grandTotal;
+      } else {
+        // Same score as previous, keep same rank
+        result.rank = currentRank;
       }
+      
+      // Move to next rank for the next iteration
+      // This ensures no gaps - if current student gets rank N,
+      // next different score gets rank N+1
+      if (idx === filtered.length - 1 || filtered[idx + 1].grandTotal !== result.grandTotal) {
+        currentRank++;
+      }
+      
       // Recalculate percentage using batchMaxTotal if available
       if (batchMaxTotal > 0) {
         result.percentage = parseFloat(((result.grandTotal / batchMaxTotal) * 100).toFixed(1));
       }
     });
+    
     setFilteredResults(filtered);
   }, [results, searchTerm, selectedBatch, batchMaxTotal]);
 
@@ -233,18 +240,14 @@ export default function ResultsPage() {
   const openEditModal = async (result: Result) => {
     setEditResult(result)
     try {
-      // Fetch full result with subjects and batch info
       const [resultRes, batchRes] = await Promise.all([
         fetch(`/api/results/${result._id}`),
         fetch(`/api/batches/${result.batch._id}`)
       ])
       const resultData = await resultRes.json()
       const batchData = await batchRes.json()
-      // batchData.subjects is an array of subject IDs
-      // Fetch subject details for these IDs
       const subjectsRes = await fetch(`/api/subjects?ids=${batchData.subjects.join(",")}`)
       const subjects = await subjectsRes.json()
-      // Merge: for each subject in batch, find marks in result (if any)
       const mergedSubjects = subjects.map((s: any) => {
         const found = (resultData.subjects || []).find((subj: any) => subj.subject._id === s._id || subj.subject === s._id)
         return {
@@ -280,11 +283,8 @@ export default function ResultsPage() {
     setEditLoading(true)
     setEditError(null)
     try {
-      // Calculate grandTotal and percentage
       const grandTotal = editSubjects.reduce((sum, subj) => sum + (subj.marks.T || 0), 0)
-      // Calculate max possible marks
       const maxTotal = editSubjects.reduce((sum, subj) => {
-        // Sum all non-computed max values from scoringScheme
         return sum + (subj.subject.scoringScheme || []).filter((c: any) => !c.computed).reduce((acc: number, c: any) => acc + (c.max || 0), 0)
       }, 0)
       const percentage = maxTotal > 0 ? parseFloat(((grandTotal / maxTotal) * 100).toFixed(2)) : 0
@@ -308,15 +308,12 @@ export default function ResultsPage() {
     }
   }
 
-  // Auto-calculate computed fields (like Total) in addSubjects
   const handleAddSubjectMarkChange = (idx: number, key: string, value: number) => {
     setAddSubjects(prev => prev.map((subj, i) => {
       if (i !== idx) return subj
       const newMarks = { ...subj.marks, [key]: value }
-      // If subject has a computed Total, recalculate it
       const totalComp = (subj.subject.scoringScheme || []).find((c: any) => !!c.computed && (c.key && (c.key.toLowerCase() === 't' || (c.label && c.label.toLowerCase() === 'total'))))
       if (totalComp && totalComp.key) {
-        // Sum all non-computed fields
         const sum = (subj.subject.scoringScheme || [])
           .filter((c: any) => !c.computed)
           .reduce((acc: number, c: any) => acc + (Number(newMarks[c.key]) || 0), 0)
@@ -332,8 +329,6 @@ export default function ResultsPage() {
     try {
       const grandTotal = addSubjects.reduce((sum, subj) => sum + (subj.marks.T || 0), 0)
       const maxTotal = addSubjects.reduce((sum, subj) => {
-        // Try to get max marks from subject object if available, fallback to 100
-        // You may want to adjust this if you have maxWritten and maxCE in subj.subject
         const maxWritten = subj.subject.maxWritten || 0
         const maxCE = subj.subject.maxCE || 0
         return sum + (maxWritten + maxCE > 0 ? maxWritten + maxCE : 100)
@@ -363,16 +358,13 @@ export default function ResultsPage() {
     }
   }
 
-  // Download CSV template for selected batch
   const handleDownloadTemplate = async () => {
     if (!selectedBatch || selectedBatch === "all") return
-    // Fetch batch and subjects
     const batchRes = await fetch(`/api/batches/${selectedBatch}`)
     const batch = await batchRes.json()
     const subjectsRes = await fetch(`/api/subjects?ids=${batch.subjects.join(",")}`)
     const subjects = await subjectsRes.json()
     setCsvSubjects(subjects)
-    // Build columns: regNumber, [subject code + scoring key ...]
     let columns = ["regNumber"]
     subjects.forEach((subj: any) => {
       (subj.scoringScheme || []).forEach((comp: any) => {
@@ -381,7 +373,6 @@ export default function ResultsPage() {
         }
       })
     })
-    // Dummy row
     let dummy = { regNumber: "STU001" }
     subjects.forEach((subj: any) => {
       (subj.scoringScheme || []).forEach((comp: any) => {
@@ -402,7 +393,6 @@ export default function ResultsPage() {
     URL.revokeObjectURL(url)
   }
 
-  // Handle CSV upload
   const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setCsvError(null)
     const file = e.target.files?.[0]
@@ -411,18 +401,15 @@ export default function ResultsPage() {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        // Validate columns
         if (!selectedBatch || selectedBatch === "all") {
           setCsvError("Please select a batch first.")
           return
         }
-        // Fetch batch and subjects for validation
         const batchRes = await fetch(`/api/batches/${selectedBatch}`)
         const batch = await batchRes.json()
         const subjectsRes = await fetch(`/api/subjects?ids=${batch.subjects.join(",")}`)
         const subjects = await subjectsRes.json()
         setCsvSubjects(subjects)
-        // Build expected columns
         let expected = ["regNumber"]
         subjects.forEach((subj: any) => {
           (subj.scoringScheme || []).forEach((comp: any) => {
@@ -443,13 +430,10 @@ export default function ResultsPage() {
     })
   }
 
-  // Submit bulk upload
   const handleBulkUpload = async () => {
     setCsvError(null)
     try {
-      // Transform preview data to API format
       const data = csvPreview.map((row) => {
-        // Find student by regNumber (assume already exists)
         return {
           regNumber: row.regNumber,
           subjects: csvSubjects.map((subj: any) => {
@@ -463,7 +447,6 @@ export default function ResultsPage() {
           })
         }
       })
-      // POST to backend
       const res = await fetch("/api/results/bulk-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -646,7 +629,6 @@ export default function ResultsPage() {
         </CardContent>
       </Card>
 
-      {/* Edit Subject Marks Modal */}
       <Dialog open={editModalOpen} onOpenChange={closeEditModal}>
         <DialogContent className="max-w-2xl w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -734,7 +716,6 @@ export default function ResultsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Result Modal */}
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent className="max-w-2xl w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -876,13 +857,11 @@ export default function ResultsPage() {
           </Button>
         </label>
       </div>
-      {/* CSV Upload Modal */}
       <Dialog open={csvUploadModalOpen} onOpenChange={setCsvUploadModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Bulk Upload Preview</DialogTitle>
           </DialogHeader>
-          {/* Improved error display for failed rows */}
           {Array.isArray(csvError) && csvError.length > 0 ? (
             <div className="mb-4">
               <div className="text-red-600 font-semibold mb-2">Some rows failed to upload:</div>
