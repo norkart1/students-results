@@ -79,14 +79,12 @@ export default function ResultsPage() {
   const [editAbsent, setEditAbsent] = useState<{ [idx: number]: boolean }>({})
   const [addComponentAbsent, setAddComponentAbsent] = useState<{ [idx: number]: { [key: string]: boolean } }>({})
   const [editComponentAbsent, setEditComponentAbsent] = useState<{ [idx: number]: { [key: string]: boolean } }>({})
+  // Calculate batchMaxTotal for selected batch (used for all students in the batch)
+  const [batchMaxTotal, setBatchMaxTotal] = useState<number>(0);
 
   useEffect(() => {
     fetchData()
   }, [])
-
-  useEffect(() => {
-    filterResults()
-  }, [results, searchTerm, selectedBatch])
 
   // Fetch students for add modal
   useEffect(() => {
@@ -119,6 +117,65 @@ export default function ResultsPage() {
     }
   }, [addBatchId])
 
+  // Calculate batchMaxTotal for selected batch (used for all students in the batch)
+  useEffect(() => {
+    async function fetchBatchMaxTotal() {
+      if (selectedBatch === "all") {
+        setBatchMaxTotal(0);
+        return;
+      }
+      const batchRes = await fetch(`/api/batches/${selectedBatch}`);
+      const batch = await batchRes.json();
+      const subjectsRes = await fetch(`/api/subjects?ids=${batch.subjects.join(",")}`);
+      const subjects = await subjectsRes.json();
+      const maxTotal = subjects.reduce((sum: number, subj: any) => {
+        return sum + (subj.scoringScheme || []).filter((c: any) => !c.computed && typeof c.max === 'number').reduce((acc: number, c: any) => acc + c.max, 0);
+      }, 0);
+      setBatchMaxTotal(maxTotal);
+    }
+    fetchBatchMaxTotal();
+  }, [selectedBatch]);
+
+  // Calculate and assign ranks with tie handling and reg number as tie-breaker
+  useEffect(() => {
+    let filtered = [...results];
+    if (selectedBatch !== "all") {
+      filtered = filtered.filter((result) => result.batch?._id === selectedBatch);
+    }
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (result) =>
+          result.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          result.student?.regNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    }
+    // Sort by grandTotal desc, then regNumber asc
+    filtered.sort((a, b) => {
+      if (b.grandTotal !== a.grandTotal) return b.grandTotal - a.grandTotal;
+      return a.student.regNumber.localeCompare(b.student.regNumber);
+    });
+    // Assign ranks (same marks = same rank, next rank is not skipped)
+    let lastTotal: number | null = null;
+    let lastRank = 0;
+    let sameRankCount = 0;
+    filtered.forEach((result, idx) => {
+      if (result.grandTotal === lastTotal) {
+        result.rank = lastRank;
+        sameRankCount++;
+      } else {
+        lastRank = idx + 1;
+        result.rank = lastRank;
+        lastTotal = result.grandTotal;
+        sameRankCount = 1;
+      }
+      // Recalculate percentage using batchMaxTotal if available
+      if (batchMaxTotal > 0) {
+        result.percentage = parseFloat(((result.grandTotal / batchMaxTotal) * 100).toFixed(1));
+      }
+    });
+    setFilteredResults(filtered);
+  }, [results, searchTerm, selectedBatch, batchMaxTotal]);
+
   const fetchData = async () => {
     try {
       setLoading(true)
@@ -142,29 +199,6 @@ export default function ResultsPage() {
       setBatches([])
     } finally {
       setLoading(false)
-    }
-  }
-
-  const filterResults = () => {
-    try {
-      let filtered = [...results]
-
-      if (selectedBatch !== "all") {
-        filtered = filtered.filter((result) => result.batch?._id === selectedBatch)
-      }
-
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (result) =>
-            result.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            result.student?.regNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-      }
-
-      setFilteredResults(filtered)
-    } catch (error) {
-      console.error("Error filtering results:", error)
-      setFilteredResults([])
     }
   }
 
