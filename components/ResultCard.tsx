@@ -34,7 +34,6 @@ interface ResultCardProps {
   }
   subjects: SubjectMark[]
   grandTotal: number
-  maxTotal: number
   rank: number
   percentage: number
 }
@@ -45,7 +44,6 @@ export default function ResultCard({
   student,
   subjects,
   grandTotal,
-  maxTotal,
   rank,
   percentage,
 }: ResultCardProps) {
@@ -88,6 +86,11 @@ export default function ResultCard({
     const subjectPercentage = isAbsent ? 0 : (totalObtained / (totalMax || 1)) * 100;
     if (isAbsent || subjectPercentage < 35) return count + 1;
     return count;
+  }, 0);
+
+  // Calculate accurate maxTotal from subjects
+  const maxTotal = subjects.reduce((sum, subjectMark) => {
+    return sum + subjectMark.subject.scoringScheme.reduce((acc, curr) => acc + (curr.max || 0), 0);
   }, 0);
 
   return (
