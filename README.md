@@ -1,6 +1,6 @@
 # Result Management System
 
-A modern, full-featured academic result management system for schools and institutions. Built with Next.js, TypeScript, MongoDB, and Tailwind CSS, it provides robust tools for managing students, subjects, batches, and examination results, with advanced analytics and reporting.
+A modern, full-featured academic result management system for schools and institutions. Built with Next.js, ThffhfhfhfhypeScript, MongoDB, and Tailwind CSS, it provides robust tools for managing students, subjects, batches, and examination results, with advanced analytics and reporting.
 
 ---
 
