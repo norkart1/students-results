@@ -278,7 +278,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm print:hidden flex flex-col md:flex-row items-center justify-center gap-2">
-            <span>
+            <span suppressHydrationWarning>
               &copy; {new Date().getFullYear()} MIC ASAS. All rights reserved.
             </span>
             <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
