@@ -85,9 +85,10 @@ export async function GET(request: NextRequest) {
           })
         }
         const subjectData = subjectMap.get(subjectId)
-        subjectData.totalMarks += subjectResult.totalMarks
+        const marks = subjectResult.totalMarks || 0
+        subjectData.totalMarks += marks
         subjectData.count += 1
-        if (subjectResult.totalMarks >= 50) {
+        if (marks >= 50) {
           subjectData.passCount += 1
         }
       })
@@ -96,8 +97,8 @@ export async function GET(request: NextRequest) {
     const subjectPerformance = Array.from(subjectMap.values()).map((subject) => ({
       subject: subject.subject,
       subjectArabic: subject.subjectArabic,
-      averageMarks: subject.totalMarks / subject.count,
-      passRate: (subject.passCount / subject.count) * 100,
+      averageMarks: subject.count > 0 ? subject.totalMarks / subject.count : 0,
+      passRate: subject.count > 0 ? (subject.passCount / subject.count) * 100 : 0,
     }))
 
     // Batch comparison (only if viewing all batches)
