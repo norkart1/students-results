@@ -375,11 +375,6 @@ export default function RootLayout({
         <meta name="ICBM" content="10.512250721059875, 76.21373803031281" />
         
         <meta httpEquiv="content-language" content="en-us" />
-        <meta name="content-type" content="text/html; charset=utf-8" />
-        
-        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="X-Frame-Options" content="DENY" />
-        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
         
         <link rel="dns-prefetch" href="//results.miconline.org" />
         <link rel="preload" href="/images/logo.webp" as="image" type="image/webp" />

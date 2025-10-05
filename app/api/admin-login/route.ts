@@ -11,7 +11,10 @@ export async function POST(request: NextRequest) {
 
   if (username === adminUsername && password === adminPassword) {
     const redirectParam = request.nextUrl.searchParams.get('redirect') || '/admin'
-    const redirectUrl = new URL(redirectParam, request.url)
+    const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.host
+    const protocol = request.headers.get('x-forwarded-proto') || request.nextUrl.protocol
+    const baseUrl = `${protocol}//${host}`
+    const redirectUrl = new URL(redirectParam, baseUrl)
     const res = NextResponse.redirect(redirectUrl)
     res.cookies.set('admin-auth', '1', {
       httpOnly: true,
@@ -23,7 +26,10 @@ export async function POST(request: NextRequest) {
     return res
   }
 
-  const loginUrl = new URL('/admin-login', request.url)
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.host
+  const protocol = request.headers.get('x-forwarded-proto') || request.nextUrl.protocol
+  const baseUrl = `${protocol}//${host}`
+  const loginUrl = new URL('/admin-login', baseUrl)
   loginUrl.searchParams.set('error', '1')
   if (request.nextUrl.searchParams.get('redirect')) {
     loginUrl.searchParams.set('redirect', request.nextUrl.searchParams.get('redirect')!)
