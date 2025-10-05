@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     // Subject performance
     const subjectMap = new Map()
     results.forEach((result) => {
-      result.subjects.forEach((subjectResult) => {
+      result.subjects.forEach((subjectResult: any) => {
         const subjectId = subjectResult.subject._id.toString()
         if (!subjectMap.has(subjectId)) {
           subjectMap.set(subjectId, {
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     }))
 
     // Batch comparison (only if viewing all batches)
-    let batchComparison = []
+    let batchComparison: any[] = []
     if (!batchId) {
       const batchMap = new Map()
       results.forEach((result) => {
